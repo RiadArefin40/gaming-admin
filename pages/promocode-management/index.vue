@@ -21,6 +21,13 @@
           </v-chip>
         </template>
 
+        <!-- Type Display -->
+        <template #item.promo_type="{ item }">
+          <v-chip color="cyan lighten-2" text-color="white" small pill>
+            {{ item.promo_type || 'any' }}
+          </v-chip>
+        </template>
+
         <!-- Action Menu -->
         <template #item.action="{ item }">
           <v-menu offset-y>
@@ -59,6 +66,12 @@
           <v-text-field label="Promo Code" v-model="promoForm.code" outlined />
           <v-text-field label="Deposit Bonus (%)" v-model.number="promoForm.depositBonus" type="number" outlined />
           <v-text-field label="Turnover (x)" v-model.number="promoForm.turnover" type="number" outlined />
+          <v-select
+            :items="promoTypes"
+            label="Promo Type"
+            v-model="promoForm.promo_type"
+            outlined
+          />
           <v-switch label="Active" v-model="promoForm.active" color="cyan" inset />
         </v-card-text>
 
@@ -74,22 +87,25 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 // Table headers
 const headers = [
   { title: "Promo Code", value: "code" },
   { title: "Deposit Bonus (%)", value: "deposit_bonus" },
   { title: "Turnover (x)", value: "turnover" },
+  { title: "Type", value: "promo_type" },
   { title: "Status", value: "status", key:"status" },
   { title: "Action", value: "action" },
 ];
-const promoCodes = ref([])
+
+const promoCodes = ref([]);
+const promoTypes = ["slot", "live-casino", "sports", "any"];
+
 async function fetchPromos() {
   const res = await fetch("https://api.bajiraj.cloud/promos");
   promoCodes.value = await res.json();
 }
-
 
 async function savePromo() {
   const method = editPromo.value ? "PUT" : "POST";
@@ -109,7 +125,6 @@ async function savePromo() {
   closeDialog();
 }
 
-
 async function deletePromo(item) {
   await fetch(`https://api.bajiraj.cloud/promos/${item.id}`, {
     method: "DELETE"
@@ -117,8 +132,6 @@ async function deletePromo(item) {
 
   fetchPromos();
 }
-
-
 
 async function toggleStatus(item) {
   await fetch(`https://api.bajiraj.cloud/promos/${item.id}/toggle`, {
@@ -128,11 +141,9 @@ async function toggleStatus(item) {
   fetchPromos();
 }
 
-
-
 // Dialog & Form
 const dialog = ref(false);
-const promoForm = ref({ id: null, code: "", depositBonus: 0, turnover: 0, active: true });
+const promoForm = ref({ id: null, code: "", depositBonus: 0, turnover: 0, promo_type: "any", active: true });
 const editPromo = ref(false);
 
 function openDialog(type, item) {
@@ -141,21 +152,18 @@ function openDialog(type, item) {
     promoForm.value = { ...item };
   } else {
     editPromo.value = false;
-    promoForm.value = { id: null, code: "", depositBonus: 0, turnover: 0, active: true };
+    promoForm.value = { id: null, code: "", depositBonus: 0, turnover: 0, promo_type: "any", active: true };
   }
   dialog.value = true;
 }
 
 function closeDialog() {
   dialog.value = false;
-  promoForm.value = { id: null, code: "", depositBonus: 0, turnover: 0, active: true };
+  promoForm.value = { id: null, code: "", depositBonus: 0, turnover: 0, promo_type: "any", active: true };
   editPromo.value = false;
 }
 
-
-
 onMounted(fetchPromos);
-
 </script>
 
 <style scoped>
