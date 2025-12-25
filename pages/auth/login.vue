@@ -51,8 +51,8 @@ import "vuetify-sonner/style.css";
 definePageMeta({ layout: "secondary" });
 
 /* ================= STATIC AUTH ================= */
-const STATIC_USERNAME = "admin";
-const STATIC_PASSWORD = "123456";
+const STATIC_USERNAME = "sadmin";
+const STATIC_PASSWORD = "p123456";
 
 /* ================= STATE ================= */
 const username = ref("");
