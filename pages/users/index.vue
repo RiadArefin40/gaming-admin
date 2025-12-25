@@ -275,6 +275,7 @@ const headers = [
   { title: "Status", value: "is_block_user", key:"status" },
   { title: "Phone", value: "phone" },
   { title: "Balance", value: "wallet" },
+  { title: "Active Turnover", value: "turnover" },
   { title: "Action", value: "action" },
 ];
 
