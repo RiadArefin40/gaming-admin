@@ -94,6 +94,7 @@ const headers = [
    { title: "Sender", value: "sender_number" },
     { title: "Receiver", value: "receiver_number" },
     {title: "Time", value:"created_at"},
+    {title:"Required Turnover", value: "turnover_required"},
   { title: "Status" , key:"status"},
    { title: "Action" , key:"actions"},
 ];
