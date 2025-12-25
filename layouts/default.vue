@@ -213,7 +213,7 @@
             ></v-progress-circular>
 
             </div>
-            <GoogleMap v-else :markers="allLocations" />
+           
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn
