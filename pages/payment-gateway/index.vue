@@ -53,6 +53,17 @@
           <v-text-field label="Gateway Name" v-model="gatewayForm.name" outlined />
           <v-text-field label="Agent Number" v-model="gatewayForm.agentNumber" outlined />
         </v-card-text>
+        <v-select
+  label="Deposit Channel"
+  :items="['cashout', 'send_money']"
+  v-model="gatewayForm.deposit_channel"
+/>
+
+<v-switch
+  label="Active"
+  v-model="gatewayForm.is_active"
+/>
+
 
         <v-card-actions class="justify-end">
           <v-btn variant="tonal" @click="dialogCreate = false">Cancel</v-btn>
@@ -71,6 +82,18 @@
           <v-text-field label="Agent Number" v-model="activeGateway.agentNumber" outlined />
         </v-card-text>
 
+        <v-select
+  label="Deposit Channel"
+  :items="['cashout', 'send_money']"
+  v-model="gatewayForm.deposit_channel"
+/>
+
+<v-switch
+  label="Active"
+  v-model="gatewayForm.is_active"
+/>
+
+
         <v-card-actions class="justify-end">
           <v-btn variant="tonal" @click="dialogEdit = false">Cancel</v-btn>
           <v-btn color="gradient-cyan" @click="updateGateway">Save</v-btn>
@@ -83,34 +106,61 @@
 <script setup>
 import { ref } from "vue";
 
+import axios from "axios";
+
+
+
+
+
 const headers = [
   { title: "Gateway Name", value: "name" },
-  { title: "Agent Number", value: "agentNumber" },
+  { title: "Agent Number", value: "agent_number" },
+  { title: "Channel", value: "deposit_channel" },
+  { title: "Status", value: "is_active" },
   { title: "Action", value: "action" },
 ];
 
+
 // Static gateway data
 const gateways = ref([
-  { id: 1, name: "Bkash", agentNumber: "01712345678" },
-  { id: 2, name: "Nagad", agentNumber: "01812345678" },
-  { id: 3, name: "Rocket", agentNumber: "01912345678" },
+
 ]);
+
+const gatewayForm = ref({
+  name: "",
+  agent_number: "",
+  deposit_channel: "cashout",
+  is_active: true,
+});
 
 const dialogCreate = ref(false);
 const dialogEdit = ref(false);
-const gatewayForm = ref({ name: "", agentNumber: "" });
+
 const activeGateway = ref({});
 
+
+
+
+const fetchGateways = async () => {
+  const { data } = await axios.get("https://api.bajiraj.cloud/api/payment-gateways");
+  gateways.value = data;
+};
+
+onMounted(fetchGateways);
+
 // Add new gateway
-function addGateway() {
-  gateways.value.push({
-    id: Date.now(),
-    name: gatewayForm.value.name,
-    agentNumber: gatewayForm.value.agentNumber,
-  });
+async function addGateway() {
+  await axios.post("/api/payment-gateways", gatewayForm.value);
   dialogCreate.value = false;
-  gatewayForm.value = { name: "", agentNumber: "" };
+  gatewayForm.value = {
+    name: "",
+    agent_number: "",
+    deposit_channel: "cashout",
+    is_active: true,
+  };
+  fetchGateways();
 }
+
 
 // Edit gateway
 function openEditDialog(gateway) {
@@ -118,18 +168,22 @@ function openEditDialog(gateway) {
   dialogEdit.value = true;
 }
 
-function updateGateway() {
-  const index = gateways.value.findIndex(g => g.id === activeGateway.value.id);
-  if (index !== -1) {
-    gateways.value[index] = { ...activeGateway.value };
-  }
+async function updateGateway() {
+  await axios.put(
+    `https://api.bajiraj.cloud/api/payment-gateways/${activeGateway.value.id}`,
+    activeGateway.value
+  );
   dialogEdit.value = false;
+  fetchGateways();
 }
 
+
 // Delete gateway
-function deleteGateway(gateway) {
-  gateways.value = gateways.value.filter(g => g.id !== gateway.id);
+async function deleteGateway(gateway) {
+  await axios.delete(`https://api.bajiraj.cloud/api/payment-gateways/${gateway.id}`);
+  fetchGateways();
 }
+
 </script>
 
 <style scoped>
