@@ -51,7 +51,7 @@
 
         <v-card-text class="d-flex flex-column gap-4">
           <v-text-field label="Gateway Name" v-model="gatewayForm.name" outlined />
-          <v-text-field label="Agent Number" v-model="gatewayForm.agentNumber" outlined />
+          <v-text-field label="Agent Number" v-model="gatewayForm.agent_number" outlined />
         </v-card-text>
         <v-select
   label="Deposit Channel"
@@ -79,7 +79,7 @@
 
         <v-card-text class="d-flex flex-column gap-4">
           <v-text-field label="Gateway Name" v-model="activeGateway.name" outlined />
-          <v-text-field label="Agent Number" v-model="activeGateway.agentNumber" outlined />
+          <v-text-field label="Agent Number" v-model="activeGateway.agent_number" outlined />
         </v-card-text>
 
         <v-select
