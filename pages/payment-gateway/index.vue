@@ -142,7 +142,7 @@ const activeGateway = ref({});
 
 
 const fetchGateways = async () => {
-  const { data } = await axios.get("https://api.bajiraj.cloud/api/payment-gateways");
+  const { data } = await axios.get("https://api.bajiraj.cloud/api/payment-gateways/");
   gateways.value = data;
 };
 
