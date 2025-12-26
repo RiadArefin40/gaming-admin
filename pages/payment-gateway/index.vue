@@ -85,12 +85,12 @@
         <v-select
   label="Deposit Channel"
   :items="['cashout', 'send_money']"
-  v-model="gatewayForm.deposit_channel"
+  v-model="activeGateway.deposit_channel"
 />
 
 <v-switch
   label="Active"
-  v-model="gatewayForm.is_active"
+  v-model="activeGateway.is_active"
 />
 
 
