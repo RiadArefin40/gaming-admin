@@ -288,8 +288,13 @@ const { current } = useLocale();
 // }
 async function handleSignOut() {
   try {
-    toast.warning(t("successfullySignOut"));
-    await signOut({ callbackUrl: "auth/login/", redirect: true });
+  
+      if (process.client) {
+         localStorage.removeItem("auth_user");
+         toast.warning("successfully SignOut");
+         navigateTo("/auth/login");
+     }
+    // await signOut({ callbackUrl: "auth/login/", redirect: true });
   } catch (e) {
     console.log(e);
   }
