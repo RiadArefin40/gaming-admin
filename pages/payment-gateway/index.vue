@@ -142,7 +142,7 @@ const activeGateway = ref({});
 
 
 const fetchGateways = async () => {
-  const { data } = await axios.get("https:/.bajiraj.cloud/payment-gateways/");
+  const { data } = await axios.get("https://api.bajiraj.cloud/payment-gateways/");
   gateways.value = data;
 };
 
@@ -150,7 +150,7 @@ onMounted(fetchGateways);
 
 // Add new gateway
 async function addGateway() {
-  await axios.post("/payment-gateways", gatewayForm.value);
+  await axios.post("https://api.bajiraj.cloud/payment-gateways", gatewayForm.value);
   dialogCreate.value = false;
   gatewayForm.value = {
     name: "",
@@ -170,7 +170,7 @@ function openEditDialog(gateway) {
 
 async function updateGateway() {
   await axios.put(
-    `https:/.bajiraj.cloud/payment-gateways/${activeGateway.value.id}`,
+    `https://api.bajiraj.cloud/payment-gateways/${activeGateway.value.id}`,
     activeGateway.value
   );
   dialogEdit.value = false;
@@ -180,7 +180,7 @@ async function updateGateway() {
 
 // Delete gateway
 async function deleteGateway(gateway) {
-  await axios.delete(`https:/.bajiraj.cloud/payment-gateways/${gateway.id}`);
+  await axios.delete(`https://api.bajiraj.cloud/payment-gateways/${gateway.id}`);
   fetchGateways();
 }
 
