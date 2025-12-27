@@ -271,6 +271,7 @@ const currentUserRole = ref("admin");
 
 const headers = [
   { title: "Username", value: "name" },
+   { title: "Password", value: "password" },
   { title: "Role", value: "role" },
   { title: "Status", value: "is_block_user", key:"status" },
   { title: "Phone", value: "phone" },

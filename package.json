@@ -12,9 +12,8 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-
-
     "@vuepic/vue-datepicker": "^9.0.2",
+    "axios": "^1.13.2",
     "jsonwebtoken": "^9.0.2",
     "lodash.debounce": "^4.0.8",
     "moment-timezone": "^0.5.45",
