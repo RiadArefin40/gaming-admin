@@ -34,7 +34,7 @@
         <!-- Action -->
         <template #item.action="{ item }">
           <v-btn
-            v-if="item.status === 'Pending'"
+            v-if="item.status === 'pending'"
             color="green"
             class="text-white mr-2"
             small
@@ -43,7 +43,7 @@
             Approve
           </v-btn>
           <v-btn
-            v-if="item.status === 'Pending'"
+            v-if="item.status === 'pending'"
             color="red"
             class="text-white"
             small
@@ -129,7 +129,7 @@ async function confirmAction() {
   if (!selectedWithdrawal.value) return;
 
   const action = dialogAction.value;
-  const res = await fetch(`/api/withdrawals/${selectedWithdrawal.value.id}/${action}`, {
+  const res = await fetch(`https://api.bajiraj.cloud/withdrawals/${selectedWithdrawal.value.id}/${action}`, {
     method: "PATCH",
   });
   const data = await res.json();
