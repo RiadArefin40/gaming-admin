@@ -87,7 +87,7 @@ const headers = [
   { title: "Amount", value: "amount" },
   { title: "Requested At", value: "created_at" },
   { title: "Status", value: "status" },
-  { title: "Action", value: "action" },
+  { title: "Action", value: "action", key:"action" },
 ];
 
 const withdrawals = ref([]);
