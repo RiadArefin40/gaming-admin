@@ -85,6 +85,9 @@ import { ref, computed, onMounted } from "vue";
 const headers = [
   { title: "Username", value: "username" },
   { title: "Amount", value: "amount" },
+  {title:"User's Num", value:"sender_number"},
+  {title:"Recieve's Num", value:"receiver_number"},
+   {title:"Payment Gateway", value:"payment_gateway"},
   { title: "Requested At", value: "created_at" },
   { title: "Status", value: "status" },
   { title: "Action", value: "action", key:"action" },
@@ -135,7 +138,7 @@ async function confirmAction() {
   const data = await res.json();
 
   // Update locally
-  const index = withdrawals.value.findIndex(w => w.id === selectedWithdrawal.value.id);
+  const index = withdrawals.value.findIndex(w => w.id == selectedWithdrawal.value.id);
   if (index !== -1) withdrawals.value[index] = data.withdrawal;
 
   dialog.value = false;
