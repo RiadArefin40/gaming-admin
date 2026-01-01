@@ -562,8 +562,8 @@ async function fetchTransactions() {
 
   try {
     const [depositRes, withdrawRes] = await Promise.all([
-      fetch("https://api.bajiraj.cloud/deposit/3"),
-      fetch("https://api.bajiraj.cloud/withdrawals/3")
+      fetch(`https://api.bajiraj.cloud/deposit/${userId}`),
+      fetch(`https://api.bajiraj.cloud/withdrawals/${userId}`)
     ])
     const depositData = await depositRes.json()
     const withdrawData = await withdrawRes.json()
