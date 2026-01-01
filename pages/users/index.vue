@@ -332,7 +332,7 @@ const activeTab = ref("deposit")
 const deposits = ref([])
 const withdrawals = ref([])
 
-onMounted(fetchTransactions)
+// onMounted(fetchTransactions)
 
 const headers = [
   { title: "Username", value: "name" },
