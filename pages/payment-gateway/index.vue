@@ -1,6 +1,18 @@
 <template>
   <v-container fluid class="pa-6">
-   <v-row class="mb-6">
+
+    <!-- Header -->
+    <v-row class="mb-6">
+      <v-col class="d-flex align-center">
+        <h2 class="text-h5 font-bold text-gray-800">Payment Gateways</h2>
+        <v-spacer />
+        <v-btn color="gradient-cyan" class="px-6" elevation="3" @click="dialogCreate = true">
+          Add Gateway
+        </v-btn>
+      </v-col>
+    </v-row>
+
+       <v-row class="mb-6">
       <v-col class="d-flex align-center">
          <h2 class="text-h5 font-bold text-gray-800">Global Auto Payment</h2>
        </v-col>
@@ -11,16 +23,6 @@
       Global Auto Payment
     </label>
   </div>
-    </v-row>
-    <!-- Header -->
-    <v-row class="mb-6">
-      <v-col class="d-flex align-center">
-        <h2 class="text-h5 font-bold text-gray-800">Payment Gateways</h2>
-        <v-spacer />
-        <v-btn color="gradient-cyan" class="px-6" elevation="3" @click="dialogCreate = true">
-          Add Gateway
-        </v-btn>
-      </v-col>
     </v-row>
 
     <!-- Payment Gateway Table -->
