@@ -95,6 +95,8 @@ const headers = [
     { title: "Receiver", value: "receiver_number" },
     {title: "Time", value:"created_at"},
     {title:"Required Turnover", value: "turnover_required"},
+    {title:"Auto Payment Id", value: "external_payout_id"},
+    {title:"Failure Reason", value:"failure_reason"},
   { title: "Status" , key:"status"},
    { title: "Action" , key:"actions"},
 ];

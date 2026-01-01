@@ -13,20 +13,21 @@
     </v-row>
 
 <v-container>
-    <v-row class="align-center">
-      <v-col cols="12" sm="6">
-        <span class="font-weight-medium">Global Auto Payment</span>
-      </v-col>
-      <v-col cols="12" sm="6">
-        <v-switch
-          v-model="enabled"
-          label="Enable Auto Payment"
-          inset
-          @change="toggle"
-        ></v-switch>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-row class="align-center">
+    <v-col cols="12" sm="6">
+      <span class="font-weight-medium">Global Auto Payment</span>
+    </v-col>
+    <v-col cols="12" sm="6">
+      <v-switch
+        v-model="enabled"
+        label="Enable Auto Payment"
+        inset
+        :color="enabled ? 'green' : 'red'"
+        @change="toggle"
+      ></v-switch>
+    </v-col>
+  </v-row>
+</v-container>
 
     <!-- Payment Gateway Table -->
     <v-card class="rounded-2xl elevation-6">
