@@ -555,7 +555,7 @@ const filteredBettings = computed(() =>
 onMounted(fetchUsers);
 
 
-onMounted(fetchTransactions)
+// onMounted(fetchTransactions)
 
 async function fetchTransactions(userId) {
   loadingTransactions.value = true
