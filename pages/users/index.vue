@@ -165,42 +165,95 @@
     </v-dialog>
 
     <!-- TRANSACTION DIALOG -->
-    <v-dialog v-model="dialogTransaction" max-width="700">
-      <v-card class="pa-6 rounded-2xl elevation-5">
-        <v-card-title class="d-flex align-center">
-          Transaction Record
-          <v-spacer />
-          <v-text-field
-            v-model="transactionSearch"
-            placeholder="Search transactions..."
-            density="compact"
-            prepend-inner-icon="mdi-magnify"
-            hide-details
-            rounded
-            style="max-width: 220px"
-          />
-        </v-card-title>
+<!-- TRANSACTION DIALOG -->
+<v-dialog v-model="dialogTransaction" max-width="900">
+  <v-card class="pa-6 rounded-2xl elevation-5">
 
-        <v-divider />
-        <v-table v-if="!loadingTransactions" density="compact" class="mt-4">
-          <tbody>
-            <tr v-for="(t,i) in filteredTransactions" :key="i">
-              <td>{{ t.date }}</td>
-              <td>{{ t.type }}</td>
-              <td :class="t.amount > 0 ? 'text-green' : 'text-red'">
-                {{ t.amount }}
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+    <!-- Header -->
+    <v-card-title class="d-flex align-center justify-space-between">
+      <span class="text-h6 font-weight-bold">Transaction History</span>
 
-<v-skeleton-loader
-  v-else
-  type="table"
-  class="mt-4"
-/>
-      </v-card>
-    </v-dialog>
+      <v-text-field
+        v-model="transactionSearch"
+        placeholder="Search..."
+        density="compact"
+        prepend-inner-icon="mdi-magnify"
+        hide-details
+        rounded
+        style="max-width: 220px"
+      />
+    </v-card-title>
+
+    <!-- Profit Summary -->
+    <v-row class="mt-2 mb-4" dense>
+      <v-col cols="3" v-for="(item, i) in profitSummary" :key="i">
+        <v-card class="pa-3 text-center" variant="tonal">
+          <div class="text-caption">{{ item.label }}</div>
+          <div
+            class="text-h6"
+            :class="item.value >= 0 ? 'text-green' : 'text-red'"
+          >
+            {{ item.value }}
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <!-- Tabs -->
+
+    <!-- MANUAL TABS -->
+    <div class="tab-wrapper mb-4">
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'deposit' }"
+        @click="activeTab = 'deposit'"
+      >
+        Deposit
+      </button>
+
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'withdraw' }"
+        @click="activeTab = 'withdraw'"
+      >
+        Withdraw
+      </button>
+    </div>
+
+    <!-- TABLE -->
+    <v-table v-if="!loadingTransactions" density="compact">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Gateway</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr v-for="(t, i) in filteredTransactions" :key="i">
+          <td>{{ formatDate(t.created_at) }}</td>
+
+          <td :class="t.amount > 0 ? 'text-green' : 'text-red'">
+            {{ t.amount }}
+          </td>
+
+          <td>{{ t.status }}</td>
+          <td>{{ t.payment_gateway }}</td>
+        </tr>
+      </tbody>
+    </v-table>
+
+    <v-skeleton-loader v-else type="table" />
+    
+
+    <v-divider class="my-3" />
+
+
+  </v-card>
+</v-dialog>
+
 
     <!-- BETTING DIALOG -->
     <v-dialog v-model="dialogBetting" max-width="700">
@@ -269,6 +322,18 @@ import { ref, computed, onMounted } from "vue";
 
 const currentUserRole = ref("admin");
 
+
+const dialogTransaction = ref(false)
+const loadingTransactions = ref(false)
+
+const activeTab = ref("deposit")
+
+
+const deposits = ref([])
+const withdrawals = ref([])
+
+onMounted(fetchTransactions)
+
 const headers = [
   { title: "Username", value: "name" },
    { title: "Password", value: "password" },
@@ -287,14 +352,14 @@ const activeUser = ref({});
 const dialogCreate = ref(false);
 const dialogEdit = ref(false);
 const dialogDetails = ref(false);
-const dialogTransaction = ref(false);
+
 const dialogBetting = ref(false);
 const dialogDelete = ref(false);
 
 // loading states
 const loadingUsers = ref(false);
 const loadingAction = ref(false);
-const loadingTransactions = ref(false);
+
 const loadingBettings = ref(false);
 
 // forms
@@ -435,19 +500,19 @@ async function toggleUserStatus(user) {
 
 
 
-// ---------------- TRANSACTIONS ----------------
-async function fetchTransactions(userId) {
-  loadingTransactions.value = true;
-  try {
-    const res = await fetch(`https://api.bajiraj.cloud/users/${userId}/transactions`);
-    transactions.value = await res.json();
-    dialogTransaction.value = true;
-  } catch {
-    alert("Failed to load transactions");
-  } finally {
-    loadingTransactions.value = false;
-  }
-}
+// // ---------------- TRANSACTIONS ----------------
+// async function fetchTransactions(userId) {
+//   loadingTransactions.value = true;
+//   try {
+//     const res = await fetch(`https://api.bajiraj.cloud/users/${userId}/transactions`);
+//     transactions.value = await res.json();
+//     dialogTransaction.value = true;
+//   } catch {
+//     alert("Failed to load transactions");
+//   } finally {
+//     loadingTransactions.value = false;
+//   }
+// }
 
 // ---------------- BETTINGS ----------------
 async function fetchBettings(userId) {
@@ -475,11 +540,11 @@ function openDialog(type, item) {
 }
 
 // ---------------- COMPUTED ----------------
-const filteredTransactions = computed(() =>
-  transactions.value.filter((t) =>
-    Object.values(t).join(" ").toLowerCase().includes(transactionSearch.value.toLowerCase())
-  )
-);
+// const filteredTransactions = computed(() =>
+//   transactions.value.filter((t) =>
+//     Object.values(t).join(" ").toLowerCase().includes(transactionSearch.value.toLowerCase())
+//   )
+// );
 
 const filteredBettings = computed(() =>
   bettings.value.filter((b) =>
@@ -488,6 +553,94 @@ const filteredBettings = computed(() =>
 );
 
 onMounted(fetchUsers);
+
+
+onMounted(fetchTransactions)
+
+async function fetchTransactions() {
+  loadingTransactions.value = true
+
+  try {
+    const [depositRes, withdrawRes] = await Promise.all([
+      fetch("https://api.bajiraj.cloud/deposit/3"),
+      fetch("https://api.bajiraj.cloud/withdrawals/3")
+    ])
+    const depositData = await depositRes.json()
+    const withdrawData = await withdrawRes.json()
+    console.log(depositData, withdrawData)
+    deposits.value = depositData.data || []
+    withdrawals.value = withdrawData || []
+     dialogTransaction.value = true;
+  } catch (e) {
+    console.error(e)
+  } finally {
+    loadingTransactions.value = false
+  }
+}
+
+/* ----------------------------
+   FILTERED TRANSACTIONS
+-----------------------------*/
+const filteredTransactions = computed(() => {
+  const source =
+    activeTab.value === "deposit" ? deposits.value : withdrawals.value
+
+  return source.filter(item =>
+    JSON.stringify(item)
+      .toLowerCase()
+      .includes(transactionSearch.value.toLowerCase())
+  )
+})
+
+/* ----------------------------
+   DATE FILTER HELPERS
+-----------------------------*/
+const isSameDay = (date) =>
+  new Date(date).toDateString() === new Date().toDateString()
+
+const isSameWeek = (date) => {
+  const now = new Date()
+  const d = new Date(date)
+  const diff = now - d
+  return diff <= 7 * 24 * 60 * 60 * 1000
+}
+
+const isSameMonth = (date) => {
+  const now = new Date()
+  const d = new Date(date)
+  return (
+    d.getMonth() === now.getMonth() &&
+    d.getFullYear() === now.getFullYear()
+  )
+}
+
+/* ----------------------------
+   PROFIT CALCULATION
+-----------------------------*/
+const calcProfit = (filterFn) => {
+  const depositSum = deposits.value
+    .filter(d => d.status === "approved" && filterFn(d.created_at))
+    .reduce((a, b) => a + Number(b.amount), 0)
+
+  const withdrawSum = withdrawals.value
+    .filter(w => w.status === "approved" && filterFn(w.created_at))
+    .reduce((a, b) => a + Number(b.amount), 0)
+
+  return depositSum - withdrawSum
+}
+
+const profitSummary = computed(() => [
+  { label: "Today", value: calcProfit(isSameDay) },
+  { label: "This Week", value: calcProfit(isSameWeek) },
+  { label: "This Month", value: calcProfit(isSameMonth) },
+  { label: "All Time", value: calcProfit(() => true) }
+])
+
+/* ----------------------------
+   UTILS
+-----------------------------*/
+const formatDate = (date) =>
+  new Date(date).toLocaleString()
 </script>
 
 <style scoped>
@@ -506,4 +659,25 @@ onMounted(fetchUsers);
 .text-gray-800 {
   color: #1f2937;
 }
+
+.tab-wrapper {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  background: #e5e7eb;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.tab-btn.active {
+  background: #1976d2;
+  color: white;
+}
+
 </style>
