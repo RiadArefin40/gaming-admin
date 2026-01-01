@@ -12,18 +12,21 @@
       </v-col>
     </v-row>
 
-       <v-row class="mb-6">
-      <v-col class="d-flex align-center">
-         <h2 class="text-h5 font-bold text-gray-800">Global Auto Payment</h2>
-       </v-col>
-
-      <div>
-    <label>
-      <input type="checkbox" v-model="enabled" @change="toggle" />
-      Global Auto Payment
-    </label>
-  </div>
+<v-container>
+    <v-row class="align-center">
+      <v-col cols="12" sm="6">
+        <span class="font-weight-medium">Global Auto Payment</span>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-switch
+          v-model="enabled"
+          label="Enable Auto Payment"
+          inset
+          @change="toggle"
+        ></v-switch>
+      </v-col>
     </v-row>
+  </v-container>
 
     <!-- Payment Gateway Table -->
     <v-card class="rounded-2xl elevation-6">
@@ -149,7 +152,7 @@ const gatewayForm = ref({
 
 const dialogCreate = ref(false);
 const dialogEdit = ref(false);
-
+const enabled = ref(true);
 const activeGateway = ref({});
 
 // Load current value
@@ -159,10 +162,14 @@ const loadSetting = async () => {
 };
 
 const toggle = async () => {
-  await axios.post("https://api.bajiraj.cloud/payment-gateways/auto-payment", {
-    enabled: enabled.value
-  });
-  alert(`Global auto payment is now ${enabled.value ? "ON" : "OFF"}`);
+  try {
+    await axios.post("https://api.bajiraj.cloud/payment-gateways/auto-payment", {
+      enabled: enabled.value
+    });
+    console.log(`Global auto payment is now ${enabled.value ? "ON" : "OFF"}`);
+  } catch (err) {
+    console.error("Failed to update auto-payment setting:", err);
+  }
 };
 
 onMounted(loadSetting);
