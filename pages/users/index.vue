@@ -5,101 +5,86 @@
       <v-col class="d-flex align-center">
         <h2 class="text-h5 font-bold text-gray-800">Users</h2>
         <v-spacer />
-        <v-btn
-        color="gradient-cyan"
-        :loading="loadingAction"
-        :disabled="loadingAction"
-        @click="createUser"
-      >
-        Create
-      </v-btn>
+        <v-btn color="gradient-cyan" :loading="loadingAction" :disabled="loadingAction" @click="createUser">
+          Create
+        </v-btn>
 
       </v-col>
     </v-row>
 
-    <!-- User Table -->
-    <v-card class="rounded-2xl elevation-6">
-      <v-skeleton-loader
-    v-if="loadingUsers"
-    type="table"
-    class="pa-4"
-  />
-      <v-data-table
-         v-else
-        :headers="headers"
-        :items="roles"
-        dense
-         density="compact"
-        class="elevation-0"
-        hide-default-footer
+
+<!-- User Table -->
+<v-card class="rounded-xl elevation-3 modern-table">
+  <!-- Skeleton loader -->
+  <v-skeleton-loader v-if="loadingUsers" type="table" class="pa-2" />
+  
+  <v-data-table
+    v-else
+    :headers="headers"
+    :items="roles"
+    dense
+    hide-default-footer
+    class="modern-data-table"
+  >
+    <!-- Status switch -->
+    <template #item.status="{ item }">
+      <v-chip
+        :color="item.is_block_user ? 'red lighten-2' : 'green lighten-2'"
+        text-color="white"
+        small
+        class="status-chip"
       >
-        <!-- Status chip -->
-  <template #item.status="{ item }">
-    
-<v-switch
-  v-model="item.is_block_user"
-  class="small-switch"
-  density="compact"
-  inset
-  :color="item.is_block_user ? 'red' : 'green'"
-  @change="toggleUserStatus(item)"
-/>
+        {{ item.is_block_user ? 'Blocked' : 'Active' }}
+      </v-chip>
+    </template>
 
-</template>
+    <!-- Balance editable -->
+    <template #item.balance="{ item }">
+      <v-text-field
+        v-if="currentUserRole === 'admin'"
+        v-model.number="item.balance"
+        type="number"
+        dense
+        hide-details
+        class="balance-input"
+        rounded
+      />
+      <span v-else>৳{{ item.balance }}</span>
+    </template>
 
-        <!-- Balance editable only for admin -->
-        <template #item.balance="{ item }">
-          <v-text-field
-            v-if="currentUserRole === 'admin'"
-            v-model.number="item.balance"
-            type="number"
-            dense
-            hide-details
-            style="max-width: 100px"
-          />
-          <span v-else>৳{{ item.balance }}</span>
+    <!-- Action menu -->
+    <template #item.action="{ item }">
+      <v-menu offset-y>
+        <template #activator="{ props }">
+          <v-btn class="small-switch" v-bind="props" icon dense>
+            <v-icon >mdi-dots-vertical</v-icon>
+          </v-btn>
         </template>
-
-        <!-- Action menu -->
-        <template #item.action="{ item }">
-          <v-menu offset-y>
-            <template #activator="{ props }">
-              <v-btn v-bind="props" icon>
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
-            </template>
-
-            <v-list>
-              <v-list-item @click="openDialog('edit', item)">
-                <v-list-item-title>Edit</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item @click="openDialog('details', item)">
-                <v-list-item-title>User Details</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item @click="openDialog('transaction', item)">
-                <v-list-item-title>Transaction Record</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item @click="openDialog('betting', item)">
-                <v-list-item-title>Betting Record</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item @click="toggleUserStatus(item)">
-                <v-list-item-title>Block/Unblock</v-list-item-title>
-              </v-list-item>
-
-              <v-divider />
-
-              <v-list-item class="text-red" @click="openDialog('delete', item)">
-                <v-list-item-title>Delete</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </template>
-      </v-data-table>
-    </v-card>
+        <v-list class="modern-menu">
+          <v-list-item @click="openDialog('edit', item)">
+            <v-list-item-title>Edit</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="openDialog('details', item)">
+            <v-list-item-title>User Details</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="openDialog('transaction', item)">
+            <v-list-item-title>Transaction Record</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="openDialog('betting', item)">
+            <v-list-item-title>Betting Record</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="toggleUserStatus(item)">
+            <v-list-item-title>Block/Unblock</v-list-item-title>
+          </v-list-item>
+          <v-divider />
+          <v-list-item class="text-red" @click="openDialog('delete', item)">
+            <v-list-item-title>Delete</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </template>
+  </v-data-table>
+</v-card>
 
     <!-- CREATE USER DIALOG -->
     <v-dialog v-model="dialogCreate" max-width="600">
@@ -111,7 +96,7 @@
           <v-text-field label="Email" v-model="createForm.email" outlined />
           <v-text-field label="Phone" v-model="createForm.phone" outlined />
           <v-text-field label="Password" type="password" v-model="createForm.password" outlined />
-          <v-select label="Role" :items="['user','agent','admin']" v-model="createForm.role" outlined />
+          <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="createForm.role" outlined />
         </v-card-text>
 
         <v-card-actions class="justify-end">
@@ -129,24 +114,14 @@
         <v-card-text class="d-flex flex-column gap-4">
           <v-text-field label="Username" v-model="activeUser.name" outlined />
           <v-text-field label="Phone" v-model="activeUser.phone" outlined />
-          <v-select label="Role" :items="['user','agent','admin']" v-model="activeUser.role" outlined />
-          <v-text-field
-            v-if="currentUserRole === 'admin'"
-            label="Balance"
-            v-model.number="activeUser.wallet"
-            type="number"
-            outlined
-          />
+          <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="activeUser.role" outlined />
+          <v-text-field v-if="currentUserRole === 'admin'" label="Balance" v-model.number="activeUser.wallet"
+            type="number" outlined />
         </v-card-text>
 
         <v-card-actions class="justify-end">
           <v-btn variant="tonal" @click="dialogEdit = false">Cancel</v-btn>
-          <v-btn
-            color="gradient-cyan"
-            :loading="loadingAction"
-            :disabled="loadingAction"
-            @click="updateUser"
-          >
+          <v-btn color="gradient-cyan" :loading="loadingAction" :disabled="loadingAction" @click="updateUser">
             Save
           </v-btn>
 
@@ -170,94 +145,76 @@
     </v-dialog>
 
     <!-- TRANSACTION DIALOG -->
-<!-- TRANSACTION DIALOG -->
-<v-dialog v-model="dialogTransaction" max-width="900">
-  <v-card class="pa-6 rounded-2xl elevation-5">
+    <!-- TRANSACTION DIALOG -->
+    <v-dialog v-model="dialogTransaction" max-width="900">
+      <v-card class="pa-6 rounded-2xl elevation-5">
 
-    <!-- Header -->
-    <v-card-title class="d-flex align-center justify-space-between">
-      <span class="text-h6 font-weight-bold">Transaction History</span>
+        <!-- Header -->
+        <v-card-title class="d-flex align-center justify-space-between">
+          <span class="text-h6 font-weight-bold">Transaction History</span>
 
-      <v-text-field
-        v-model="transactionSearch"
-        placeholder="Search..."
-        density="compact"
-        prepend-inner-icon="mdi-magnify"
-        hide-details
-        rounded
-        style="max-width: 220px"
-      />
-    </v-card-title>
+          <v-text-field v-model="transactionSearch" placeholder="Search..." density="compact"
+            prepend-inner-icon="mdi-magnify" hide-details rounded style="max-width: 220px" />
+        </v-card-title>
 
-    <!-- Profit Summary -->
-    <v-row class="mt-2 mb-4" dense>
-      <v-col cols="3" v-for="(item, i) in profitSummary" :key="i">
-        <v-card class="pa-3 text-center" variant="tonal">
-          <div class="text-caption">{{ item.label }}</div>
-          <div
-            class="text-h6"
-            :class="item.value >= 0 ? 'text-green' : 'text-red'"
-          >
-            {{ item.value }}
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
+        <!-- Profit Summary -->
+        <v-row class="mt-2 mb-4" dense>
+          <v-col cols="3" v-for="(item, i) in profitSummary" :key="i">
+            <v-card class="pa-3 text-center" variant="tonal">
+              <div class="text-caption">{{ item.label }}</div>
+              <div class="text-h6" :class="item.value >= 0 ? 'text-green' : 'text-red'">
+                {{ item.value }}
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
 
-    <!-- Tabs -->
+        <!-- Tabs -->
 
-    <!-- MANUAL TABS -->
-    <div class="tab-wrapper mb-4">
-      <button
-        class="tab-btn"
-        :class="{ active: activeTab === 'deposit' }"
-        @click="activeTab = 'deposit'"
-      >
-        Deposit
-      </button>
+        <!-- MANUAL TABS -->
+        <div class="tab-wrapper mb-4">
+          <button class="tab-btn" :class="{ active: activeTab === 'deposit' }" @click="activeTab = 'deposit'">
+            Deposit
+          </button>
 
-      <button
-        class="tab-btn"
-        :class="{ active: activeTab === 'withdraw' }"
-        @click="activeTab = 'withdraw'"
-      >
-        Withdraw
-      </button>
-    </div>
+          <button class="tab-btn" :class="{ active: activeTab === 'withdraw' }" @click="activeTab = 'withdraw'">
+            Withdraw
+          </button>
+        </div>
 
-    <!-- TABLE -->
-    <v-table v-if="!loadingTransactions" density="compact">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Amount</th>
-          <th>Status</th>
-          <th>Gateway</th>
-        </tr>
-      </thead>
+        <!-- TABLE -->
+        <v-table v-if="!loadingTransactions" density="compact">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Gateway</th>
+            </tr>
+          </thead>
 
-      <tbody>
-        <tr v-for="(t, i) in filteredTransactions" :key="i">
-          <td>{{ formatDate(t.created_at) }}</td>
+          <tbody>
+            <tr v-for="(t, i) in filteredTransactions" :key="i">
+              <td>{{ formatDate(t.created_at) }}</td>
 
-          <td :class="t.amount > 0 ? 'text-green' : 'text-red'">
-            {{ t.amount }}
-          </td>
+              <td :class="t.amount > 0 ? 'text-green' : 'text-red'">
+                {{ t.amount }}
+              </td>
 
-          <td>{{ t.status }}</td>
-          <td>{{ t.payment_gateway }}</td>
-        </tr>
-      </tbody>
-    </v-table>
+              <td>{{ t.status }}</td>
+              <td>{{ t.payment_gateway }}</td>
+            </tr>
+          </tbody>
+        </v-table>
 
-    <v-skeleton-loader v-else type="table" />
-    
-
-    <v-divider class="my-3" />
+        <v-skeleton-loader v-else type="table" />
 
 
-  </v-card>
-</v-dialog>
+        <v-divider class="my-3" />
+
+
+      </v-card>
+    </v-dialog>
 
 
     <!-- BETTING DIALOG -->
@@ -266,21 +223,14 @@
         <v-card-title class="d-flex align-center">
           Betting Record
           <v-spacer />
-          <v-text-field
-            v-model="bettingSearch"
-            placeholder="Search betting..."
-            density="compact"
-            prepend-inner-icon="mdi-magnify"
-            hide-details
-            rounded
-            style="max-width: 220px"
-          />
+          <v-text-field v-model="bettingSearch" placeholder="Search betting..." density="compact"
+            prepend-inner-icon="mdi-magnify" hide-details rounded style="max-width: 220px" />
         </v-card-title>
 
         <v-divider />
         <v-table v-if="!loadingBettings" density="compact" class="mt-4">
           <tbody>
-            <tr v-for="(b,i) in filteredBettings" :key="i">
+            <tr v-for="(b, i) in filteredBettings" :key="i">
               <td>{{ b.game }}</td>
               <td>৳{{ b.bet }}</td>
               <td :class="b.result === 'Win' ? 'text-green' : 'text-red'">
@@ -290,11 +240,7 @@
           </tbody>
         </v-table>
 
-        <v-skeleton-loader
-          v-else
-          type="table"
-          class="mt-4"
-        />
+        <v-skeleton-loader v-else type="table" class="mt-4" />
 
       </v-card>
     </v-dialog>
@@ -307,12 +253,7 @@
         <p class="text-gray-600">This action cannot be undone.</p>
         <v-card-actions class="justify-center mt-4">
           <v-btn variant="tonal" @click="dialogDelete = false">Cancel</v-btn>
-        <v-btn
-            color="red lighten-2"
-            :loading="loadingAction"
-            :disabled="loadingAction"
-            @click="deleteUser"
-          >
+          <v-btn color="red lighten-2" :loading="loadingAction" :disabled="loadingAction" @click="deleteUser">
             Delete
           </v-btn>
 
@@ -341,9 +282,9 @@ const withdrawals = ref([])
 
 const headers = [
   { title: "Username", value: "name" },
-   { title: "Password", value: "password" },
+  { title: "Password", value: "password" },
   { title: "Role", value: "role" },
-  { title: "Status", value: "is_block_user", key:"status" },
+  { title: "Status", value: "is_block_user", key: "status" },
   { title: "Phone", value: "phone" },
   { title: "Balance", value: "wallet" },
   { title: "Active Turnover", value: "turnover" },
@@ -536,7 +477,7 @@ async function fetchBettings(userId) {
 // ---------------- HELPERS ----------------
 function openDialog(type, item) {
   activeUser.value = { ...item };
-  console.log('user', item )
+  console.log('user', item)
   if (type === "edit") dialogEdit.value = true;
   if (type === "details") dialogDetails.value = true;
   if (type === "transaction") fetchTransactions(item.id);
@@ -575,7 +516,7 @@ async function fetchTransactions(userId) {
     console.log(depositData, withdrawData)
     deposits.value = depositData.data || []
     withdrawals.value = withdrawData || []
-     dialogTransaction.value = true;
+    dialogTransaction.value = true;
   } catch (e) {
     console.error(e)
   } finally {
@@ -650,15 +591,19 @@ const formatDate = (date) =>
 .gradient-cyan {
   background: linear-gradient(to right, #00bcd4, #00acc1);
 }
+
 .text-green {
   color: #2e7d32;
 }
+
 .text-red {
   color: #c62828;
 }
+
 .text-gray-600 {
   color: #6b7280;
 }
+
 .text-gray-800 {
   color: #1f2937;
 }
@@ -687,7 +632,189 @@ const formatDate = (date) =>
   transform: scale(0.65);
   transform-origin: left center;
 }
-.v-data-table__tr{
+
+.v-data-table__tr {
   height: 10px !important;
 }
+/* Modern dense table */
+.modern-data-table {
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.modern-data-table th {
+  font-weight: 600;
+  color: #374151;
+  background: #f3f4f6;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 8px 12px;
+}
+
+.modern-data-table td {
+  padding: 6px 12px;
+  vertical-align: middle;
+}
+
+.status-chip {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.balance-input {
+  max-width: 90px;
+  font-size: 13px;
+  text-align: right;
+}
+
+.modern-menu {
+  min-width: 180px;
+}
+
+.v-data-table__wrapper {
+  border-radius: 12px;
+}
+
+/* Dense switch styling */
+.v-input--switch {
+  margin: 0 auto;
+}
+
+/* Row hover effect */
+.v-data-table__wrapper tr:hover {
+  background-color: #f9fafb;
+  transform: translateY(-1px);
+  transition: 0.2s;
+}
+
+/* Skeleton loader rounded */
+.v-skeleton-loader {
+  border-radius: 10px;
+}
+/* Buttons */
+.gradient-cyan {
+  background: linear-gradient(135deg, #00bcd4, #00acc1);
+  color: white !important;
+}
+.table__wrapper > table > thead > tr > th{
+  background-color: #f3f4f6;
+}
+.v-table > .v-table__wrapper > table > tbody > tr > th, .v-table > .v-table__wrapper > table > thead > tr > th, .v-table > .v-table__wrapper > table > tfoot > tr > th {
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  color: #374151 !important;
+}
+.v-btn {
+  font-size: 13px;
+  text-transform: none;
+  padding: 4px 12px;
+}
+
+/* Table */
+.modern-data-table {
+  border-radius: 12px;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.modern-data-table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: #374151;
+  background: #f3f4f6;
+  padding: 6px 10px;
+}
+
+.modern-data-table td {
+  padding: 4px 10px;
+  vertical-align: middle;
+}
+
+.v-data-table__wrapper tr:hover {
+  background-color: #f9fafb;
+  transform: translateY(-1px);
+  transition: 0.15s;
+}
+
+.status-chip {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+/* Balance input */
+.balance-input {
+  max-width: 80px;
+  text-align: right;
+  font-size: 13px;
+}
+
+/* Action menu */
+.modern-menu {
+  min-width: 160px;
+  font-size: 13px;
+}
+
+/* Tabs */
+.tab-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.tab-btn.active {
+  background: #1976d2;
+  color: white;
+}
+
+/* Skeleton loader */
+.v-skeleton-loader {
+  border-radius: 8px;
+}
+
+/* Switch compact */
+.small-switch {
+  transform: scale(0.65);
+  transform-origin: left center;
+}
+
+/* Dialogs */
+.v-dialog .v-card {
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+/* Profit cards */
+.v-card[variant="tonal"] {
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+/* Text colors */
+.text-green {
+  color: #10b981;
+}
+.text-red {
+  color: #ef4444;
+}
+.text-gray-600 {
+  color: #6b7280;
+}
+.text-gray-800 {
+  color: #1f2937;
+}
+
 </style>

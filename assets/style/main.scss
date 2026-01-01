@@ -54,3 +54,20 @@
 .status-ok { color: #16a34a; }
 .status-warn { color: #f59e0b; }
 .status-bad { color: #dc2626; }
+
+.v-table > .v-table__wrapper > table > tbody > tr > th,
+.v-table > .v-table__wrapper > table > thead > tr > th,
+.v-table > .v-table__wrapper > table > tfoot > tr > th {
+  height: 40px !important;
+  background-color: #bbe7ca !important;
+  font-weight: 700 !important;
+  user-select: none;
+  text-align: start;
+}
+
+.v-table .v-table__wrapper > table > tbody > tr > td,
+.v-table .v-table__wrapper > table > tbody > tr > th {
+ background-color: #f6f8f7 !important;
+ border-bottom: 2px solid #d1e4d4 !important;
+  height: 25px !important;
+}

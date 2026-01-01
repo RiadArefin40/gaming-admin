@@ -35,7 +35,7 @@
                 class="border-b"
                 prepend-icon="mdi-view-dashboard"
                 :title="('dashboard')"
-                value="home"
+                value="/"
               >
               </v-list-item>
             </Nuxt-link>
@@ -49,6 +49,17 @@
                 prepend-icon="mdi-account"
                 :title="('Users')"
                 value="users"
+              ></v-list-item>
+            </Nuxt-link>
+                <Nuxt-link
+
+              to="/headline"
+            >
+              <v-list-item
+                class="border-b"
+                prepend-icon="mdi-account"
+                :title="('Headline')"
+                value="headline"
               ></v-list-item>
             </Nuxt-link>
             <Nuxt-link
