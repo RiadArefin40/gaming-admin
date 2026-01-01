@@ -618,12 +618,10 @@ const isSameMonth = (date) => {
    PROFIT CALCULATION
 -----------------------------*/
 const calcProfit = (filterFn) => {
-  const depositSum = deposits.value
-    .filter(d => d.status === "approved" && filterFn(d.created_at))
+  const depositSum = deposits?.value?.filter(d => d.status === "approved" && filterFn(d.created_at))
     .reduce((a, b) => a + Number(b.amount), 0)
 
-  const withdrawSum = withdrawals.value
-    .filter(w => w.status === "approved" && filterFn(w.created_at))
+  const withdrawSum = withdrawals?.value?.filter(w => w.status === "approved" && filterFn(w.created_at))
     .reduce((a, b) => a + Number(b.amount), 0)
 
   return depositSum - withdrawSum
