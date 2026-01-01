@@ -28,18 +28,23 @@
          v-else
         :headers="headers"
         :items="roles"
+        dense
+         density="compact"
         class="elevation-0"
         hide-default-footer
       >
         <!-- Status chip -->
   <template #item.status="{ item }">
+    
 <v-switch
   v-model="item.is_block_user"
-  color="red"
+  class="small-switch"
+  density="compact"
   inset
+  :color="item.is_block_user ? 'red' : 'green'"
   @change="toggleUserStatus(item)"
-  :label="item.is_block_user ? 'Blocked' : 'Active'"
 />
+
 </template>
 
         <!-- Balance editable only for admin -->
@@ -678,4 +683,11 @@ const formatDate = (date) =>
   color: white;
 }
 
+.small-switch {
+  transform: scale(0.65);
+  transform-origin: left center;
+}
+.v-data-table__tr{
+  height: 10px !important;
+}
 </style>
