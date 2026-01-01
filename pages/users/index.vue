@@ -557,7 +557,7 @@ onMounted(fetchUsers);
 
 onMounted(fetchTransactions)
 
-async function fetchTransactions() {
+async function fetchTransactions(userId) {
   loadingTransactions.value = true
 
   try {
