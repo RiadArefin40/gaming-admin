@@ -1,5 +1,17 @@
 <template>
   <v-container fluid class="pa-6">
+   <v-row class="mb-6">
+      <v-col class="d-flex align-center">
+         <h2 class="text-h5 font-bold text-gray-800">Global Auto Payment</h2>
+       </v-col>
+
+      <div>
+    <label>
+      <input type="checkbox" v-model="enabled" @change="toggle" />
+      Global Auto Payment
+    </label>
+  </div>
+    </v-row>
     <!-- Header -->
     <v-row class="mb-6">
       <v-col class="d-flex align-center">
@@ -138,7 +150,20 @@ const dialogEdit = ref(false);
 
 const activeGateway = ref({});
 
+// Load current value
+const loadSetting = async () => {
+  const res = await axios.get("https://api.bajiraj.cloud/payment-gateways/auto-payment");
+  enabled.value = res.data.auto_payment_enabled;
+};
 
+const toggle = async () => {
+  await axios.post("https://api.bajiraj.cloud/payment-gateways/auto-payment", {
+    enabled: enabled.value
+  });
+  alert(`Global auto payment is now ${enabled.value ? "ON" : "OFF"}`);
+};
+
+onMounted(loadSetting);
 
 
 const fetchGateways = async () => {
