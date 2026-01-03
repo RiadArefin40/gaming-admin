@@ -29,7 +29,7 @@
         :headers="headers"
         :items="filteredNotifications"
         class="elevation-0"
-        hide-default-footer
+     
       >
         <template #item.status="{ item }">
           <v-chip

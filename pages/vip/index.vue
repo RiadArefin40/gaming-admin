@@ -17,7 +17,7 @@
         :headers="headers"
         :items="vipLevels"
         class="elevation-0"
-        hide-default-footer
+     
       >
         <!-- Coin to Money -->
         <template #item.exchange="{ item }">

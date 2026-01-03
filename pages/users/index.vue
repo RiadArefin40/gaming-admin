@@ -11,7 +11,18 @@
 
       </v-col>
     </v-row>
-
+<v-row class="mb-4" align="center">
+  <v-col cols="12" sm="4" md="3">
+    <v-text-field
+      v-model="userSearch"
+      placeholder="Search users..."
+      prepend-inner-icon="mdi-magnify"
+      dense
+      hide-details
+      rounded
+    />
+  </v-col>
+</v-row>
 
 <!-- User Table -->
 <v-card class="rounded-xl elevation-3 modern-table">
@@ -21,9 +32,9 @@
   <v-data-table
     v-else
     :headers="headers"
-    :items="roles"
+    :items="filteredUsers"
     dense
-    hide-default-footer
+ 
     class="modern-data-table"
   >
     <!-- Status switch -->
@@ -323,6 +334,19 @@ const bettingSearch = ref("");
 
 const transactions = ref([]);
 const bettings = ref([]);
+
+const userSearch = ref("");
+
+const filteredUsers = computed(() => {
+  if (!userSearch.value) return roles.value;
+
+  return roles.value.filter(user =>
+    Object.values(user)
+      .join(" ")
+      .toLowerCase()
+      .includes(userSearch.value.toLowerCase())
+  );
+});
 
 // ---------------- FETCH USERS ----------------
 async function fetchUsers() {

@@ -16,7 +16,7 @@
       <v-data-table
         :headers="headers"
         :items="slides"
-        hide-default-footer
+     
         class="elevation-0"
       >
         <template #item.image="{ item }">

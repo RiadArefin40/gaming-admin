@@ -35,7 +35,7 @@
         :headers="headers"
         :items="gateways"
         class="elevation-0"
-        hide-default-footer
+     
       >
         <!-- Action menu -->
         <template #item.action="{ item }">
