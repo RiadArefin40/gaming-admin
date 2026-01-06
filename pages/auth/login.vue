@@ -72,7 +72,7 @@ async function  handleLogin() {
    try {
    const res = await axios.post("https://api.bajiraj.cloud/auth/login", {
   
-      body: JSON.stringify({ identifier: username.value, password: password.value }),
+      body: { identifier: username.value, password: password.value },
     });
 
     const data = res.data;
