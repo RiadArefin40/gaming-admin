@@ -155,6 +155,7 @@ const headers = [
 
   { title: "Type", value: "type" },
   { title: "Amount", value: "amount" },
+    { title: "Bonus", value: "bonus_amount" },
   { title: "Status", value: "status" },
 ];
 
@@ -231,12 +232,17 @@ const clearFilter = () => {
 
 // ---------- STATS ----------
 const stats = computed(() => {
-  const totalDep = filteredDeposits.value.reduce((a, b) => a + +b.amount, 0)
+  const totalDep = filteredDeposits.value.reduce(
+  (sum, d) => sum + Number(d.amount) - Number(d.bonus_amount || 0),
+  0
+);
+  const totalDepBonus = filteredDeposits.value.reduce((a, b) => a + +b?.bonus_amount, 0)
   const totalWit = filteredWithdrawals.value.reduce((a, b) => a + +b.amount, 0)
   const netProfit = totalDep - totalWit
 
   return [
     { label: "Total Deposit", value: totalDep, color: "green" },
+     { label: "Total Bonus", value: totalDepBonus, color: "red" },
     { label: "Total Withdraw", value: totalWit, color: "red" },
     { label: "Net Profit", value: netProfit, color: netProfit >= 0 ? "green" : "red" },
     { label: "Transactions", value: filteredDeposits.value.length + filteredWithdrawals.value.length, color: "purple" }

@@ -98,7 +98,7 @@
               ></v-list-item>
             </Nuxt-link>
 
-                        <Nuxt-link
+            <Nuxt-link
     
               to="/sliders"
             >
