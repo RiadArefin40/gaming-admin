@@ -36,7 +36,7 @@ const messageType = ref("");
 
 onMounted(async () => {
   try {
-    const res = await fetch("https://api.bajiraj.cloud/users/headline");
+    const res = await fetch("https://stage.api.bajiraj.com/users/headline");
     const data = await res.json();
     title.value = data.title || "";
   } catch (err) {
@@ -55,7 +55,7 @@ const updateHeadline = async () => {
   message.value = "";
 
   try {
-    const res = await fetch("https://api.bajiraj.cloud/users/headline", {
+    const res = await fetch("https://stage.api.bajiraj.com/users/headline", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: title.value }),

@@ -116,8 +116,8 @@ const fetchData = async () => {
   loading.value = true
   try {
     const [depRes, witRes] = await Promise.all([
-      fetch("https://api.bajiraj.cloud/deposit"),
-      fetch("https://api.bajiraj.cloud/withdrawals")
+      fetch("https://stage.api.bajiraj.com/deposit"),
+      fetch("https://stage.api.bajiraj.com/withdrawals")
     ])
     const dep = await depRes.json()
     const wit = await witRes.json()

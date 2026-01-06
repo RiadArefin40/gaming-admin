@@ -138,7 +138,7 @@ async function confirmAction() {
   const action = dialogAction.value; // 'approve' or 'reject'
 
   try {
-    const res = await fetch(`https://api.bajiraj.cloud/deposit/${depositId}/${action}`, {
+    const res = await fetch(`https://stage.api.bajiraj.com/deposit/${depositId}/${action}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"
@@ -172,7 +172,7 @@ async function confirmAction() {
 async function fetchTransactions() {
   loading.value = true;
   try {
-    const res = await fetch("https://api.bajiraj.cloud/deposit"); // Replace with real endpoint
+    const res = await fetch("https://stage.api.bajiraj.com/deposit"); // Replace with real endpoint
     transactions.value = await res.json();
   } catch (err) {
     console.error("Failed to fetch transactions:", err);

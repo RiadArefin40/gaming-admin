@@ -352,7 +352,7 @@ const filteredUsers = computed(() => {
 async function fetchUsers() {
   loadingUsers.value = true;
   try {
-    const res = await fetch("https://api.bajiraj.cloud/users");
+    const res = await fetch("https://stage.api.bajiraj.com/users");
     roles.value = await res.json();
   } catch (err) {
     console.error(err);
@@ -365,7 +365,7 @@ async function fetchUsers() {
 async function createUser() {
   loadingAction.value = true;
   try {
-    const res = await fetch("https://api.bajiraj.cloud/users", {
+    const res = await fetch("https://stage.api.bajiraj.com/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(createForm.value),
@@ -397,7 +397,7 @@ async function updateUser() {
 
   try {
     const res = await fetch(
-      `https://api.bajiraj.cloud/users/${activeUser.value.id}`,
+      `https://stage.api.bajiraj.com/users/${activeUser.value.id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -427,7 +427,7 @@ async function deleteUser() {
   loadingAction.value = true;
 
   try {
-    await fetch(`https://api.bajiraj.cloud/users/${activeUser.value.id}`, {
+    await fetch(`https://stage.api.bajiraj.com/users/${activeUser.value.id}`, {
       method: "DELETE",
     });
 
@@ -450,7 +450,7 @@ async function deleteUser() {
 async function toggleUserStatus(user) {
   try {
     const res = await fetch(
-      `https://api.bajiraj.cloud/users/${user.id}/toggle-status`,
+      `https://stage.api.bajiraj.com/users/${user.id}/toggle-status`,
       { method: "PATCH" }
     );
 
@@ -474,7 +474,7 @@ async function toggleUserStatus(user) {
 // async function fetchTransactions(userId) {
 //   loadingTransactions.value = true;
 //   try {
-//     const res = await fetch(`https://api.bajiraj.cloud/users/${userId}/transactions`);
+//     const res = await fetch(`https://stage.api.bajiraj.com/users/${userId}/transactions`);
 //     transactions.value = await res.json();
 //     dialogTransaction.value = true;
 //   } catch {
@@ -488,7 +488,7 @@ async function toggleUserStatus(user) {
 async function fetchBettings(userId) {
   loadingBettings.value = true;
   try {
-    const res = await fetch(`https://api.bajiraj.cloud/users/${userId}/bettings`);
+    const res = await fetch(`https://stage.api.bajiraj.com/users/${userId}/bettings`);
     bettings.value = await res.json();
     dialogBetting.value = true;
   } catch {
@@ -532,8 +532,8 @@ async function fetchTransactions(userId) {
 
   try {
     const [depositRes, withdrawRes] = await Promise.all([
-      fetch(`https://api.bajiraj.cloud/deposit/${userId}`),
-      fetch(`https://api.bajiraj.cloud/withdrawals/${userId}`)
+      fetch(`https://stage.api.bajiraj.com/deposit/${userId}`),
+      fetch(`https://stage.api.bajiraj.com/withdrawals/${userId}`)
     ])
     const depositData = await depositRes.json()
     const withdrawData = await withdrawRes.json()

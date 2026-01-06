@@ -101,7 +101,7 @@ const dialogAction = ref("");
 
 // Fetch withdrawals from backend
 async function fetchWithdrawals() {
-  const res = await fetch("https://api.bajiraj.cloud/withdrawals");
+  const res = await fetch("https://stage.api.bajiraj.com/withdrawals");
   withdrawals.value = await res.json();
 }
 
@@ -132,7 +132,7 @@ async function confirmAction() {
   if (!selectedWithdrawal.value) return;
 
   const action = dialogAction.value;
-  const res = await fetch(`https://api.bajiraj.cloud/withdrawals/${selectedWithdrawal.value.id}/${action}`, {
+  const res = await fetch(`https://stage.api.bajiraj.com/withdrawals/${selectedWithdrawal.value.id}/${action}`, {
     method: "PATCH",
   });
   const data = await res.json();
