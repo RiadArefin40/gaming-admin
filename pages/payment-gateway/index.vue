@@ -197,7 +197,7 @@ const toggle = async () => {
 
 const toggleCashout = async () => {
   try {
-    await axios.post("https://stage.api.bajiraj.com/payment-gateways/widthraw", {
+    await axios.post("https://api.bajiraj.cloud/payment-gateways/widthraw", {
       enabled: enabledCashout.value
     });
     console.log(`Global auto payment is now ${enabledCashout.value ? "ON" : "OFF"}`);
