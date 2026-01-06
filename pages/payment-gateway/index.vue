@@ -38,7 +38,7 @@
     <v-col cols="12" sm="6">
       <v-switch
         v-model="enabledCashout"
-        label="Enable Auto Payment"
+        label="Enable Cashout"
         inset
         :color="enabledCashout ? 'green' : 'red'"
         @change="toggleCashout"
