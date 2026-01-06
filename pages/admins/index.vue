@@ -5,9 +5,9 @@
       <v-col class="d-flex align-center">
         <h2 class="text-h5 font-bold text-gray-800">Users</h2>
         <v-spacer />
-        <!-- <v-btn color="gradient-cyan" :loading="loadingAction" :disabled="loadingAction" @click="dialogCreate = true">
+        <v-btn color="gradient-cyan" :loading="loadingAction" :disabled="loadingAction" @click="dialogCreate = true">
           Create
-        </v-btn> -->
+        </v-btn>
 
       </v-col>
     </v-row>
@@ -81,9 +81,9 @@
           <v-list-item @click="openDialog('transaction', item)">
             <v-list-item-title>Transaction Record</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="openDialog('betting', item)">
+          <!-- <v-list-item @click="openDialog('betting', item)">
             <v-list-item-title>Betting Record</v-list-item-title>
-          </v-list-item>
+          </v-list-item> -->
           <v-list-item @click="toggleUserStatus(item)">
             <v-list-item-title>Block/Unblock</v-list-item-title>
           </v-list-item>
@@ -125,8 +125,9 @@
         <v-card-text class="d-flex flex-column gap-4">
           <v-text-field label="Username" v-model="activeUser.name" outlined />
           <v-text-field label="Phone" v-model="activeUser.phone" outlined />
-          <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="activeUser.role" outlined />
-          <v-text-field v-if="currentUserRole === 'admin'" label="Balance" v-model.number="activeUser.wallet"
+          <v-text-field label="Password" v-model="activeUser.password" outlined />
+          <!-- <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="activeUser.role" outlined /> -->
+          <v-text-field v-if="currentUserRole == ''" label="Balance" v-model.number="activeUser.wallet"
             type="number" outlined />
         </v-card-text>
 
@@ -271,13 +272,17 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+         <VSonner position="top-center" />
   </v-container>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-
-const currentUserRole = ref("admin");
+import { VSonner, toast } from "vuetify-sonner";
+const user = process.client
+  ? localStorage.getItem("auth_user")
+  : null;
+const currentUserRole = user?.role || (user ? JSON.parse(user).role : null);
 
 
 const dialogTransaction = ref(false)
@@ -353,11 +358,10 @@ async function fetchUsers() {
   loadingUsers.value = true;
   try {
     const res = await fetch("https://api.bajiraj.cloud/users");
-        const data = await res.json();
+    const data = await res.json();
    roles.value = data.filter(
-  user => user.role !== "admin" && user.role !== "agent"
+  user => user.role === "admin" || user.role === "agent"
 );
-    // roles.value = await res.json();
   } catch (err) {
     console.error(err);
   } finally {
@@ -412,15 +416,12 @@ async function updateUser() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
 
-    const index = roles.value.findIndex(
-      (u) => u.id === activeUser.value.id
-    );
-
-    if (index !== -1) roles.value[index] = data.user;
-
+fetchUsers();
+     toast.success("Successfully Updated");
     dialogEdit.value = false;
   } catch (err) {
-    alert(err.message);
+ 
+      toast.error("Not Updated ! Something went wrong.");
   } finally {
     loadingAction.value = false;
   }

@@ -51,6 +51,17 @@
                 value="users"
               ></v-list-item>
             </Nuxt-link>
+              <Nuxt-link
+              v-if="user && JSON.parse(user).role === 'admin'"
+              to="/admins"
+            >
+              <v-list-item
+                class="border-b"
+                prepend-icon="mdi-account"
+                :title="('Admins')"
+                value="admins"
+              ></v-list-item>
+            </Nuxt-link>
             <Nuxt-link
 
               to="/headline"
@@ -256,6 +267,10 @@ import GoogleMap from "~/components/GoogleMap.vue";
 const seeLocation = ref(false);
 const allLocations = [];
 const locationBtnLoading = ref(false);
+
+const user = process.client
+  ? localStorage.getItem("auth_user")
+  : null;
 
 //  const token = useAuthData?.token?.value;
 const token = '';
