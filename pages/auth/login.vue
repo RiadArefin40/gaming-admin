@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import { VSonner, toast } from "vuetify-sonner";
 import "vuetify-sonner/style.css";
-
+import axios from "axios";
 definePageMeta({ layout: "secondary" });
 
 /* ================= STATIC AUTH ================= */
@@ -70,16 +70,12 @@ async function  handleLogin() {
   loading.value = true;
 
    try {
-   const res = await fetch("https://api.bajiraj.cloud/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "*/*",
-      },
+   const res = await axios.post("https://api.bajiraj.cloud/auth/login", {
+  
       body: JSON.stringify({ identifier: username.value, password: password.value }),
     });
 
-    const data = await res.json();
+    const data = res.data;
     if(data.user.role !== "admin" && data.user.role !== "agent"){
       toast.error("You do not have permission to access this panel");
       loading.value = false;
