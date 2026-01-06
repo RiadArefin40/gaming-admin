@@ -49,7 +49,7 @@
 
     <!-- RECENT TRANSACTIONS -->
     <div class="transactions-card">
-      <h3>Recent Transactions</h3>
+      <h3 class="mb-2">Recent Transactions</h3>
 
       <!-- TAB TOGGLE -->
       <div class="tab-toggle">
@@ -58,11 +58,52 @@
         <button :class="{ active: transactionTab === 'Withdraw' }" @click="transactionTab = 'Withdraw'">Withdraw</button>
       </div>
 
-      <template v-if="loading">
-        <div v-for="i in 5" :key="i" class="transaction-row skeleton-row"></div>
-      </template>
 
-      <table v-else class="transactions-table">
+      <v-data-table
+  :headers="headers"
+  :items="displayedTransactions"
+   dense
+>
+  <!-- Date -->
+  <template #item.created_at="{ item }">
+    {{ formatDate(item.created_at) }}
+  </template>
+
+  <!-- User -->
+  <template #item.user_id="{ item }">
+    #{{ item.user_id }}
+  </template>
+
+  <!-- Amount -->
+  <template #item.amount="{ item }">
+    <span :class="item.type === 'Deposit' ? 'text-green' : 'text-red'">
+      {{ item.amount }}
+    </span>
+  </template>
+
+  <!-- Status -->
+  <template #item.status="{ item }">
+    <span
+      :class="{
+        'status-ok': item.status === 'approved',
+        'status-warn': item.status === 'processing',
+        'status-bad': item.status === 'failed' || item.status === 'rejected'
+      }"
+    >
+      {{ item.status }}
+    </span>
+  </template>
+
+  <!-- Empty state -->
+  <template #no-data>
+    <div class="text-center text-grey py-4">
+      No transactions found
+    </div>
+  </template>
+</v-data-table>
+
+
+      <!-- <table v-else class="transactions-table">
         <thead>
           <tr>
             <th>Date</th>
@@ -90,7 +131,7 @@
             <td colspan="5" class="text-center text-grey">No transactions found</td>
           </tr>
         </tbody>
-      </table>
+      </table> -->
     </div>
 
   </div>
@@ -107,6 +148,16 @@ const loading = ref(true)
 // Date filter
 const filterStart = ref('')
 const filterEnd = ref('')
+
+const headers = [
+    { title: "User", value: "user_name" },
+  { title: "Date", value: "created_at" },
+
+  { title: "Type", value: "type" },
+  { title: "Amount", value: "amount" },
+  { title: "Status", value: "status" },
+];
+
 
 // Transaction tab: All / Deposit / Withdraw
 const transactionTab = ref('All')

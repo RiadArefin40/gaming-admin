@@ -34,7 +34,7 @@
               <v-list-item
                 class="border-b"
                 prepend-icon="mdi-view-dashboard"
-                :title="('dashboard')"
+                :title="('Dashboard')"
                 value="/"
               >
               </v-list-item>
@@ -51,7 +51,7 @@
                 value="users"
               ></v-list-item>
             </Nuxt-link>
-                <Nuxt-link
+            <Nuxt-link
 
               to="/headline"
             >
@@ -81,7 +81,7 @@
               <v-list-item
                 class="border-b"
                 prepend-icon="mdi-lock"
-                :title="('Payment gateway')"
+                :title="('Payment Gateway')"
                 value="roles"
               ></v-list-item>
             </Nuxt-link>

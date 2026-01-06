@@ -657,9 +657,9 @@ const formatDate = (date) =>
   transform-origin: left center;
 }
 
-.v-data-table__tr {
+/* .v-data-table__tr {
   height: 10px !important;
-}
+} */
 /* Modern dense table */
 .modern-data-table {
   border-radius: 12px;

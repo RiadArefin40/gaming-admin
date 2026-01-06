@@ -22,7 +22,7 @@
         <v-progress-circular indeterminate size="64" color="cyan"></v-progress-circular>
       </v-overlay>
 
-      <v-data-table :headers="headers" :items="filteredTransactions" hide-default-footer>
+      <v-data-table :headers="headers" :items="filteredTransactions" densed>
         <!-- Status -->
         <template #item.status="{ item }">
           <v-chip :color="getStatusColor(item.status)" text-color="white" small pill>
@@ -85,7 +85,7 @@ import { ref, computed, onMounted } from "vue";
 
 // Table headers
 const headers = [
-  { title: "UserId", value: "user_id" },
+  { title: "Name", value: "user_name" },
   { title: "Type", value: "payment_gateway" },
   { title: "Amount", value: "amount" },
    { title: "TRNX", value: "transaction_id" },
