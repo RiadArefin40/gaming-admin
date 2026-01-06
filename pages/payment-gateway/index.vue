@@ -37,10 +37,10 @@
     </v-col>
     <v-col cols="12" sm="6">
       <v-switch
-        v-model="enabled"
+        v-model="enabledCashout"
         label="Enable Auto Payment"
         inset
-        :color="enabled ? 'green' : 'red'"
+        :color="enabledCashout ? 'green' : 'red'"
         @change="toggleCashout"
       ></v-switch>
     </v-col>
@@ -172,12 +172,16 @@ const gatewayForm = ref({
 const dialogCreate = ref(false);
 const dialogEdit = ref(false);
 const enabled = ref(true);
+const enabledCashout = ref(true);
 const activeGateway = ref({});
 
 // Load current value
 const loadSetting = async () => {
   const res = await axios.get("https://api.bajiraj.cloud/payment-gateways/auto-payment");
   enabled.value = res.data.auto_payment_enabled;
+
+    const res1 = await axios.get("https://api.bajiraj.cloud/payment-gateways/widthraw");
+  enabledCashout.value = res1.data.widthraw;
 };
 
 const toggle = async () => {
@@ -194,9 +198,9 @@ const toggle = async () => {
 const toggleCashout = async () => {
   try {
     await axios.post("https://stage.api.bajiraj.com/payment-gateways/widthraw", {
-      enabled: enabled.value
+      enabled: enabledCashout.value
     });
-    console.log(`Global auto payment is now ${enabled.value ? "ON" : "OFF"}`);
+    console.log(`Global auto payment is now ${enabledCashout.value ? "ON" : "OFF"}`);
   } catch (err) {
     console.error("Failed to update auto-payment setting:", err);
   }
