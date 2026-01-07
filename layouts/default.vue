@@ -61,7 +61,7 @@
     </NuxtLink>
 
     <NuxtLink to="/headline">
-      <v-list-item prepend-icon="mdi-text" title="Headline" class="menu-item" />
+      <v-list-item prepend-icon="mdi-text" title="System Setting" class="menu-item" />
     </NuxtLink>
 <!-- 
     <NuxtLink to="/notifications">
