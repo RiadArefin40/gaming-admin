@@ -2,26 +2,27 @@
   <v-container fluid class="pa-6">
     <!-- Header -->
     <v-row class="mb-6">
-      <v-col class="d-flex align-center">
-        <h2 class="text-h5 font-bold text-gray-800">Users</h2>
-        <v-spacer />
-        <v-btn color="gradient-cyan" :loading="loadingAction" :disabled="loadingAction" @click="dialogCreate = true">
-          Create
-        </v-btn>
-
-      </v-col>
+     
     </v-row>
 <v-row class="mb-4" align="center">
   <v-col cols="12" sm="4" md="3">
     <v-text-field
       v-model="userSearch"
       placeholder="Search users..."
-      prepend-inner-icon="mdi-magnify"
-      dense
-      hide-details
-      rounded
+  prepend-inner-icon="mdi-magnify"
+  variant="solo"
+  hide-details
+  class="search-input"
+  density="comfortable"
     />
   </v-col>
+   <v-col class="d-flex align-center">
+        <v-spacer />
+        <v-btn color="gradient-cyan" :loading="loadingAction" :disabled="loadingAction" @click="dialogCreate = true">
+          Create
+        </v-btn>
+
+      </v-col>
 </v-row>
 
 <!-- User Table -->

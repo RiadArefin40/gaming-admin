@@ -3,15 +3,17 @@
     <!-- Header -->
     <v-row class="mb-6">
       <v-col class="d-flex align-center">
-        <h2 class="text-h5 font-bold text-gray-800">Withdrawal Requests</h2>
-        <v-spacer />
+        <!-- <h2 class="text-h5 font-bold text-gray-800">Withdrawal Requests</h2>
+        <v-spacer /> -->
         <v-text-field
           v-model="search"
           placeholder="Search by username or type..."
           prepend-inner-icon="mdi-magnify"
-          density="compact"
-          hide-details
-          style="max-width: 300px"
+   
+  variant="solo"
+  hide-details
+  class="search-input"
+  density="comfortable"
         />
       </v-col>
     </v-row>
