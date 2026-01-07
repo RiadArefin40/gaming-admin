@@ -3,15 +3,16 @@
     <!-- Header -->
     <v-row class="mb-6">
       <v-col class="d-flex align-center">
-        <h2 class="text-h5 font-bold text-gray-800">Transaction Manual Approval</h2>
-        <v-spacer />
+        <!-- <h2 class="text-h5 font-bold text-gray-800">Transaction Manual Approval</h2> -->
+        <!-- <v-spacer /> -->
         <v-text-field
           v-model="search"
           placeholder="Search by username or type..."
-          prepend-inner-icon="mdi-magnify"
-          density="compact"
-          hide-details
-          style="max-width: 300px"
+    prepend-inner-icon="mdi-magnify"
+  variant="solo"
+  hide-details
+  class="search-input"
+  density="comfortable"
         />
       </v-col>
     </v-row>
@@ -22,7 +23,7 @@
         <v-progress-circular indeterminate size="64" color="cyan"></v-progress-circular>
       </v-overlay>
 
-      <v-data-table :headers="headers" :items="filteredTransactions" hide-default-footer>
+      <v-data-table :headers="headers" :items="filteredTransactions" densed>
         <!-- Status -->
         <template #item.status="{ item }">
           <v-chip :color="getStatusColor(item.status)" text-color="white" small pill>
@@ -85,7 +86,7 @@ import { ref, computed, onMounted } from "vue";
 
 // Table headers
 const headers = [
-  { title: "UserId", value: "user_id" },
+  { title: "Name", value: "user_name" },
   { title: "Type", value: "payment_gateway" },
   { title: "Amount", value: "amount" },
    { title: "TRNX", value: "transaction_id" },

@@ -3,8 +3,8 @@
     <!-- Header -->
     <v-row class="mb-6">
       <v-col class="d-flex align-center">
-        <h2 class="text-h5 font-bold text-gray-800">Promo Code Management</h2>
-        <v-spacer />
+        <!-- <h2 class="text-h5 font-bold text-gray-800">Promo Code Management</h2>
+        <v-spacer /> -->
         <v-btn color="gradient-cyan" class=" px-6" elevation="3" @click="openDialog('add')">
           Add Promo Code
         </v-btn>
@@ -32,9 +32,16 @@
         <template #item.action="{ item }">
           <v-menu offset-y>
             <template #activator="{ props }">
-              <v-btn v-bind="props" icon>
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
+         <v-btn
+  v-bind="props"
+  icon
+  class="kebab-btn"
+  elevation="2"
+  rounded
+  outlined
+>
+  <v-icon>mdi-dots-vertical</v-icon>
+</v-btn>
             </template>
 
             <v-list>
@@ -179,4 +186,34 @@ onMounted(fetchPromos);
 .rounded-2xl {
   border-radius: 1rem;
 }
+.kebab-btn {
+  background: #ffffff;
+  color: #475569;
+  transition: all 0.25s ease;
+  border-radius: 12px;
+  padding: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kebab-btn:hover {
+  background: linear-gradient(135deg, #6366f1, #22d3ee);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+  transform: translateY(-1px);
+}
+
+.kebab-btn .v-icon {
+  font-size: 20px;
+  transition: color 0.25s ease;
+}
+
+/* Optional: ripple effect removal for smoother hover */
+.kebab-btn .v-ripple__container {
+  opacity: 0 !important;
+}
+
 </style>

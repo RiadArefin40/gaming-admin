@@ -3,22 +3,24 @@
     <!-- Header -->
     <v-row class="mb-6">
       <v-col class="d-flex align-center">
-        <h2 class="text-h5 font-bold text-gray-800">Withdrawal Requests</h2>
-        <v-spacer />
+        <!-- <h2 class="text-h5 font-bold text-gray-800">Withdrawal Requests</h2>
+        <v-spacer /> -->
         <v-text-field
           v-model="search"
           placeholder="Search by username or type..."
           prepend-inner-icon="mdi-magnify"
-          density="compact"
-          hide-details
-          style="max-width: 300px"
+   
+  variant="solo"
+  hide-details
+  class="search-input"
+  density="comfortable"
         />
       </v-col>
     </v-row>
 
     <!-- Withdrawals Table -->
     <v-card class="rounded-2xl elevation-6">
-      <v-data-table :headers="headers" :items="filteredWithdrawals" hide-default-footer>
+      <v-data-table :headers="headers" :items="filteredWithdrawals" densed>
         <!-- Status -->
         <template #item.status="{ item }">
           <v-chip
@@ -83,7 +85,7 @@
 import { ref, computed, onMounted } from "vue";
 
 const headers = [
-  { title: "Username", value: "username" },
+  { title: "User", value: "user_name" },
   { title: "Amount", value: "amount" },
   {title:"User's Num", value:"sender_number"},
   {title:"Recieve's Num", value:"receiver_number"},

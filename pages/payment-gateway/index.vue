@@ -4,30 +4,52 @@
     <!-- Header -->
     <v-row class="mb-6">
       <v-col class="d-flex align-center">
-        <h2 class="text-h5 font-bold text-gray-800">Payment Gateways</h2>
-        <v-spacer />
+        <!-- <h2 class="text-h5 font-bold text-gray-800">Payment Gateways</h2>
+        <v-spacer /> -->
         <v-btn color="gradient-cyan" class="px-6" elevation="3" @click="dialogCreate = true">
           Add Gateway
         </v-btn>
       </v-col>
     </v-row>
 
-<v-container>
-  <v-row class="align-center">
-    <v-col cols="12" sm="6">
-      <span class="font-weight-medium">Global Auto Payment</span>
-    </v-col>
-    <v-col cols="12" sm="6">
+<v-row dense class="toggle-grid">
+  <!-- Auto Payment -->
+  <v-col cols="12" sm="6">
+    <div class="toggle-card">
+      <div class="toggle-left">
+        <div class="toggle-title">Global Auto Payment</div>
+        <div class="toggle-sub">Automatically process payments</div>
+      </div>
+
       <v-switch
         v-model="enabled"
-        label="Enable Auto Payment"
         inset
-        :color="enabled ? 'green' : 'red'"
+        hide-details
+        :color="enabled ? 'success' : 'grey'"
         @change="toggle"
-      ></v-switch>
-    </v-col>
-  </v-row>
-</v-container>
+      />
+    </div>
+  </v-col>
+
+  <!-- Cashout -->
+  <v-col cols="12" sm="6">
+    <div class="toggle-card">
+      <div class="toggle-left">
+        <div class="toggle-title">Cashout</div>
+        <div class="toggle-sub">Enable user withdrawals</div>
+      </div>
+
+      <v-switch
+        v-model="enabledCashout"
+        inset
+        hide-details
+        :color="enabledCashout ? 'success' : 'grey'"
+        @change="toggleCashout"
+      />
+    </div>
+  </v-col>
+</v-row>
+
 
 <v-container>
   <v-row class="align-center">
@@ -58,9 +80,16 @@
         <template #item.action="{ item }">
           <v-menu offset-y>
             <template #activator="{ props }">
-              <v-btn v-bind="props" icon>
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
+         <v-btn
+  v-bind="props"
+  icon
+  class="kebab-btn"
+  elevation="2"
+  rounded
+  outlined
+>
+  <v-icon>mdi-dots-vertical</v-icon>
+</v-btn>
             </template>
 
             <v-list>
@@ -171,12 +200,16 @@ const gatewayForm = ref({
 const dialogCreate = ref(false);
 const dialogEdit = ref(false);
 const enabled = ref(true);
+const enabledCashout = ref(true);
 const activeGateway = ref({});
 
 // Load current value
 const loadSetting = async () => {
   const res = await axios.get("https://stage.api.bajiraj.com/payment-gateways/auto-payment");
   enabled.value = res.data.auto_payment_enabled;
+
+    const res1 = await axios.get("https://stage.api.bajiraj.com/payment-gateways/widthraw");
+  enabledCashout.value = res1.data.widthraw;
 };
 
 const toggle = async () => {
@@ -193,14 +226,13 @@ const toggle = async () => {
 const toggleCashout = async () => {
   try {
     await axios.post("https://stage.api.bajiraj.com/payment-gateways/widthraw", {
-      enabled: enabled.value
+      enabled: enabledCashout.value
     });
-    console.log(`Global auto payment is now ${enabled.value ? "ON" : "OFF"}`);
+    console.log(`Global auto payment is now ${enabledCashout.value ? "ON" : "OFF"}`);
   } catch (err) {
     console.error("Failed to update auto-payment setting:", err);
   }
 };
-
 
 onMounted(loadSetting);
 
@@ -257,4 +289,69 @@ async function deleteGateway(gateway) {
 .text-red {
   color: #c62828;
 }
+.toggle-grid {
+  margin-bottom: 16px;
+}
+
+.toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e6e8ec;
+  transition: all 0.25s ease;
+}
+
+.toggle-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.toggle-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toggle-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.toggle-sub {
+  font-size: 12px;
+  color: #8b8f97;
+}
+.kebab-btn {
+  background: #ffffff;
+  color: #475569;
+  transition: all 0.25s ease;
+  border-radius: 12px;
+  padding: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kebab-btn:hover {
+  background: linear-gradient(135deg, #6366f1, #22d3ee);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+  transform: translateY(-1px);
+}
+
+.kebab-btn .v-icon {
+  font-size: 20px;
+  transition: color 0.25s ease;
+}
+
+/* Optional: ripple effect removal for smoother hover */
+.kebab-btn .v-ripple__container {
+  opacity: 0 !important;
+}
+
 </style>

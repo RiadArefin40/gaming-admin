@@ -66,29 +66,50 @@ function required(v: any) {
 }
 
 /* ================= LOGIN ================= */
-function handleLogin() {
+async function  handleLogin() {
   loading.value = true;
 
-  setTimeout(() => {
-    if (
-      username.value === STATIC_USERNAME &&
-      password.value === STATIC_PASSWORD
-    ) {
+   try {
+   const res = await fetch("https://stage.api.bajiraj.com/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "*/*",
+      },
+      body: JSON.stringify({ identifier: username.value, password: password.value }),
+    });
+
+    const data = await res.json();
+    if(data.user.role !== "admin" && data.user.role !== "agent"){
+      toast.error("You do not have permission to access this panel");
+      loading.value = false;
+      return;
+    }
+    console.log(data);
       localStorage.setItem(
         "auth_user",
         JSON.stringify({
-          username: username.value,
-          loggedIn: true,
+           username: data.user.name,
+           role: data.user.role,
+           loggedIn: true,
         })
       );
-
-      toast.success("Successfully logged in");
+          toast.success("Successfully logged in");
       navigateTo("/");
-    } else {
-      toast.warning("Invalid username or password");
-    }
-
+  } catch (err) {
+    console.error('login',err);
     loading.value = false;
-  }, 800); // fake delay
+  }
+
+  // setTimeout(() => {
+  // {
+
+
+  //     toast.success("Successfully logged in");
+  //     navigateTo("/");
+  //   } 
+
+  //   loading.value = false;
+  // }, 800); // fake delay
 }
 </script>

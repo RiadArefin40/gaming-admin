@@ -1,19 +1,28 @@
 <template>
   <v-container fluid class="pa-6">
-
+    <!-- Header -->
+    <v-row class="mb-6">
+     
+    </v-row>
 <v-row class="mb-4" align="center">
   <v-col cols="12" sm="4" md="3">
-<v-text-field
-  v-model="userSearch"
-  placeholder="Search users..."
+    <v-text-field
+      v-model="userSearch"
+      placeholder="Search users..."
   prepend-inner-icon="mdi-magnify"
   variant="solo"
   hide-details
   class="search-input"
   density="comfortable"
-/>
-
+    />
   </v-col>
+   <v-col class="d-flex align-center">
+        <v-spacer />
+        <v-btn color="gradient-cyan" :loading="loadingAction" :disabled="loadingAction" @click="dialogCreate = true">
+          Create
+        </v-btn>
+
+      </v-col>
 </v-row>
 
 <!-- User Table -->
@@ -73,9 +82,9 @@
           <v-list-item @click="openDialog('transaction', item)">
             <v-list-item-title>Transaction Record</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="openDialog('betting', item)">
+          <!-- <v-list-item @click="openDialog('betting', item)">
             <v-list-item-title>Betting Record</v-list-item-title>
-          </v-list-item>
+          </v-list-item> -->
           <v-list-item @click="toggleUserStatus(item)">
             <v-list-item-title>Block/Unblock</v-list-item-title>
           </v-list-item>
@@ -117,8 +126,9 @@
         <v-card-text class="d-flex flex-column gap-4">
           <v-text-field label="Username" v-model="activeUser.name" outlined />
           <v-text-field label="Phone" v-model="activeUser.phone" outlined />
-          <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="activeUser.role" outlined />
-          <v-text-field v-if="currentUserRole === 'admin'" label="Balance" v-model.number="activeUser.wallet"
+          <v-text-field label="Password" v-model="activeUser.password" outlined />
+          <!-- <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="activeUser.role" outlined /> -->
+          <v-text-field v-if="currentUserRole == ''" label="Balance" v-model.number="activeUser.wallet"
             type="number" outlined />
         </v-card-text>
 
@@ -263,13 +273,17 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+         <VSonner position="top-center" />
   </v-container>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-
-const currentUserRole = ref("admin");
+import { VSonner, toast } from "vuetify-sonner";
+const user = process.client
+  ? localStorage.getItem("auth_user")
+  : null;
+const currentUserRole = user?.role || (user ? JSON.parse(user).role : null);
 
 
 const dialogTransaction = ref(false)
@@ -345,11 +359,10 @@ async function fetchUsers() {
   loadingUsers.value = true;
   try {
     const res = await fetch("https://stage.api.bajiraj.com/users");
-        const data = await res.json();
+    const data = await res.json();
    roles.value = data.filter(
-  user => user.role !== "admin" && user.role !== "agent"
+  user => user.role === "admin" || user.role === "agent"
 );
-    // roles.value = await res.json();
   } catch (err) {
     console.error(err);
   } finally {
@@ -404,15 +417,12 @@ async function updateUser() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
 
-    const index = roles.value.findIndex(
-      (u) => u.id === activeUser.value.id
-    );
-
-    if (index !== -1) roles.value[index] = data.user;
-
+fetchUsers();
+     toast.success("Successfully Updated");
     dialogEdit.value = false;
   } catch (err) {
-    alert(err.message);
+ 
+      toast.error("Not Updated ! Something went wrong.");
   } finally {
     loadingAction.value = false;
   }
@@ -836,56 +846,5 @@ const formatDate = (date) =>
 .text-gray-800 {
   color: #1f2937;
 }
-
-
-/* input field design */
-/* Search input container */
-.search-input {
-  max-width: 360px;
-}
-
-/* Input base */
-.search-input .v-field {
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.05),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.04);
-  transition: all 0.25s ease;
-}
-
-/* Hover */
-.search-input .v-field:hover {
-  box-shadow:
-    0 12px 26px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(99, 102, 241, 0.25);
-}
-
-/* Focus */
-.search-input .v-field--active {
-  box-shadow:
-    0 14px 30px rgba(99, 102, 241, 0.25),
-    inset 0 0 0 1px rgba(99, 102, 241, 0.4);
-}
-
-/* Icon */
-.search-input .v-field__prepend-inner {
-  color: #6366f1;
-}
-
-/* Input text */
-.search-input input {
-  font-size: 14px;
-  font-weight: 500;
-  color: #020617;
-}
-
-/* Placeholder */
-.search-input input::placeholder {
-  color: #94a3b8;
-  font-weight: 400;
-}
-
-
 
 </style>
