@@ -48,12 +48,24 @@
         <div v-for="i in 3" :key="i" class="summary-card skeleton"></div>
       </template>
       <template v-else>
-        <div v-for="item in summary" :key="item.label" class="summary-card">
-          <div class="summary-title">{{ item.label }}</div>
-          <div class="summary-value" :class="item.value >= 0 ? 'text-green' : 'text-red'">
-            {{ item.value.toLocaleString() }}
-          </div>
-        </div>
+     <div v-for="item in summary" :key="item.label" class="summary-card">
+  <div class="summary-title">{{ item.label }}</div>
+
+  <div
+    class="summary-value"
+    :class="item.value >= 0 ? 'text-green' : 'text-red'"
+    :style="item.label === 'Withdrawable Balance' ? {
+      display: 'inline-block',
+      padding: '6px 14px',
+      borderRadius: '999px',
+      background: 'linear-gradient(135deg, #0f172a, #1e293b)',
+      boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06), 0 6px 14px rgba(0,0,0,0.35)'
+    } : {}"
+  >
+    {{ item.value.toLocaleString() }}
+  </div>
+</div>
+
       </template>
     </div>
 
@@ -281,7 +293,8 @@ const stats = computed(() => {
     { label: "Total Withdraw", value: totalWit, color: "red" },
       {
     label: "Withdrawable Balance",
-    value: withdrawableBalance.value
+    value: withdrawableBalance.value,
+    color: "red"
   },
     { label: "Net Profit", value: netProfit, color: netProfit >= 0 ? "green" : "red" },
     { label: "Transactions", value: filteredDeposits.value.length + filteredWithdrawals.value.length, color: "purple" }
