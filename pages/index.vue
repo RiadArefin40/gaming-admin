@@ -269,8 +269,8 @@ const stats = computed(() => {
 })
 
 const calcProfit = (filterFn) =>
-  deposits.value.filter(d => filterFn(d.created_at)).reduce((a, b) => a + +b.amount, 0) -
-  withdrawals.value.filter(w => filterFn(w.created_at)).reduce((a, b) => a + +b.amount, 0)
+  deposits.value.filter(d => filterFn(d.created_at)).filter(w => w.status === "approved").reduce((a, b) => a + +Number(b.amount) - Number(b.bonus_amount || 0), 0) -
+  withdrawals.value.filter(w => filterFn(w.created_at)).filter(w => w.status === "approved").reduce((a, b) => a + +b.amount, 0)
 
 const summary = computed(() => [
   { label: "Today", value: calcProfit(isToday) },
