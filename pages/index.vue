@@ -252,9 +252,6 @@ const stats = computed(() => {
       0
     );
 
-  return {
-    totalDep
-  };
 
 
   const totalDepBonus = filteredDeposits.value.reduce((a, b) => a + +b?.bonus_amount, 0)
