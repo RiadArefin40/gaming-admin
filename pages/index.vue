@@ -282,7 +282,7 @@ const stats = computed(() => {
     .filter(w => w.status === "approved")
     .reduce((sum, w) => sum + Number(w.amount), 0);
 
-  return Math.max(0, approvedDeposit - approvedWithdraw);
+  return approvedDeposit - approvedWithdraw;
 
 });
 
