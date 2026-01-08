@@ -255,7 +255,8 @@ const stats = computed(() => {
 
 
   const totalDepBonus = filteredDeposits.value.reduce((a, b) => a + +b?.bonus_amount, 0)
-  const totalWit = filteredWithdrawals.value.reduce((a, b) => a + +b.amount, 0)
+  
+  const totalWit = filteredWithdrawals.value.filter(w => w.status === "approved").reduce((a, b) => a + +b.amount, 0)
   const netProfit = totalDep - totalWit
 
   return [
