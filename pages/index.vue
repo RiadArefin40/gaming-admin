@@ -245,10 +245,18 @@ const clearFilter = () => {
 
 // ---------- STATS ----------
 const stats = computed(() => {
-  const totalDep = filteredDeposits.value.reduce(
-  (sum, d) => sum + Number(d.amount) - Number(d.bonus_amount || 0),
-  0
-);
+  const totalDep = filteredDeposits.value
+    .filter(d => d.status === "approved")
+    .reduce(
+      (sum, d) => sum + Number(d.amount) - Number(d.bonus_amount || 0),
+      0
+    );
+
+  return {
+    totalDep
+  };
+
+
   const totalDepBonus = filteredDeposits.value.reduce((a, b) => a + +b?.bonus_amount, 0)
   const totalWit = filteredWithdrawals.value.reduce((a, b) => a + +b.amount, 0)
   const netProfit = totalDep - totalWit
