@@ -4,24 +4,9 @@
 
       <!-- Tabs -->
       <div class="tabs">
-        <button
-          :class="{ active: activeTab === 'headline' }"
-          @click="activeTab = 'headline'"
-        >
-          Dashboard Headline
-        </button>
-        <button
-          :class="{ active: activeTab === 'turnover' }"
-          @click="activeTab = 'turnover'"
-        >
-          Turnover Settings
-        </button>
-        <button
-          :class="{ active: activeTab === 'referral' }"
-          @click="activeTab = 'referral'"
-        >
-          Referral & Deposit
-        </button>
+        <button :class="{ active: activeTab === 'headline' }" @click="activeTab = 'headline'">Dashboard Headline</button>
+        <button :class="{ active: activeTab === 'turnover' }" @click="activeTab = 'turnover'">Turnover Settings</button>
+        <button :class="{ active: activeTab === 'referral' }" @click="activeTab = 'referral'">Referral & Deposit</button>
       </div>
 
       <!-- Tab Content -->
@@ -29,11 +14,7 @@
 
         <!-- Headline Tab -->
         <div v-if="activeTab === 'headline'" class="tab-panel">
-          <input
-            type="text"
-            v-model="title"
-            placeholder="Enter dashboard headline"
-          />
+          <input type="text" v-model="title" placeholder="Enter dashboard headline" />
           <button :disabled="loading" @click="updateHeadline">
             <span v-if="loading" class="spinner"></span>
             {{ loading ? "Saving..." : "Save" }}
@@ -42,12 +23,8 @@
 
         <!-- Turnover Tab -->
         <div v-if="activeTab === 'turnover'" class="tab-panel">
-          <label>Turnover Finish Time</label>
-          <input type="time" v-model="turnoverTime" step="60" />
-
           <label>Delay Time (minutes)</label>
           <input type="number" v-model="delayTime" min="0" placeholder="Enter delay" />
-
           <button :disabled="loading" @click="updateTurnover">
             <span v-if="loading" class="spinner"></span>
             {{ loading ? "Saving..." : "Save" }}
@@ -56,11 +33,11 @@
 
         <!-- Referral & Deposit Tab -->
         <div v-if="activeTab === 'referral'" class="tab-panel">
-          <label>Referral Bonus (%)</label>
+          <label>Referral Bonus (Referred User)</label>
           <input type="number" v-model="referralBonus" min="0" max="100" placeholder="Enter referral %" />
 
-          <label>Deposit Condition (Min Amount)</label>
-          <input type="number" v-model="depositCondition" min="0" placeholder="Enter min deposit" />
+          <label>Owner Bonus</label>
+          <input type="number" v-model="ownerBonus" min="0" max="100" placeholder="Enter owner %" />
 
           <button :disabled="loading" @click="updateReferral">
             <span v-if="loading" class="spinner"></span>
@@ -79,82 +56,72 @@
   </div>
 </template>
 
-
-
 <script setup>
 import { ref, onMounted } from "vue";
 
+// Tabs
 const activeTab = ref("headline");
+
+// Headline
 const title = ref("");
+
+// Turnover
+const delayTime = ref(0); // delay in minutes
+
+// Referral
+const referralBonus = ref(0); // referred user bonus
+const ownerBonus = ref(0);    // owner bonus
 
 const loading = ref(false);
 const message = ref("");
 const messageType = ref("");
 
+// Fetch initial data
 onMounted(async () => {
   try {
-    const res = await fetch("https://api.bajiraj.cloud/users/headline");
-    const data = await res.json();
-    title.value = data.title || "";
-    turnoverTime.value = data.turnover_time || "23:59";
+    // HEADLINE
+    const resHeadline = await fetch("https://stage.api.bajiraj.com/users/headline");
+    const dataHeadline = await resHeadline.json();
+    title.value = dataHeadline.title || "";
+
+    // FETCH DELAY from system settings
+    const resDelay = await fetch("https://stage.api.bajiraj.com/withdrawals/system/settings/turnover-delay");
+    const dataDelay = await resDelay.json();
+    delayTime.value = dataDelay.turnover_delay || 0;
+
+    // FETCH REFERRAL SETTINGS
+    const resReferral = await fetch("https://stage.api.bajiraj.com/users/referral-setting");
+    const dataReferral = await resReferral.json();
+    referralBonus.value = dataReferral.referred_bonus || 0;
+    ownerBonus.value = dataReferral.owner_bonus || 0;
+
   } catch (err) {
-    console.error(err);
+    console.error("Failed to fetch settings:", err);
   }
 });
 
-
-const turnoverTime = ref("23:59");
-const delayTime = ref(0); // new: delay time in minutes
-
-const updateTurnover = async () => {
-  loading.value = true;
-  message.value = "";
-
-  try {
-    const res = await fetch("https://api.bajiraj.cloud/users/headline", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        turnover_time: turnoverTime.value,
-        delay_minutes: delayTime.value
-      }),
-    });
-
-    if (!res.ok) throw new Error("Failed to update turnover time");
-
-    message.value = "Turnover settings updated!";
-    messageType.value = "success";
-  } catch (err) {
-    message.value = "Something went wrong.";
-    messageType.value = "error";
-  } finally {
-    loading.value = false;
-  }
-};
-
-
+// Update Headline
 const updateHeadline = async () => {
   if (!title.value.trim()) {
     message.value = "Headline cannot be empty!";
     messageType.value = "error";
     return;
   }
-
   loading.value = true;
   message.value = "";
 
   try {
-    const res = await fetch("https://api.bajiraj.cloud/users/headline", {
+    const res = await fetch("https://stage.api.bajiraj.com/users/headline", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: title.value }),
     });
-
     if (!res.ok) throw new Error("Failed to update headline");
 
     message.value = "Headline updated successfully!";
     messageType.value = "success";
   } catch (err) {
+    console.error(err);
     message.value = "Something went wrong.";
     messageType.value = "error";
   } finally {
@@ -162,8 +129,58 @@ const updateHeadline = async () => {
   }
 };
 
+// Update Turnover
+const updateTurnover = async () => {
+  loading.value = true;
+  message.value = "";
 
+  try {
+    await fetch("https://stage.api.bajiraj.com/withdrawals/system/settings/turnover-delay", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ value: delayTime.value }),
+    });
+
+    message.value = "Turnover settings updated!";
+    messageType.value = "success";
+  } catch (err) {
+    console.error(err);
+    message.value = "Something went wrong.";
+    messageType.value = "error";
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Update Referral & Deposit
+const updateReferral = async () => {
+  loading.value = true;
+  message.value = "";
+
+  try {
+    const res = await fetch("https://stage.api.bajiraj.com/users/referral-setting", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        referred_bonus: referralBonus.value,
+        owner_bonus: ownerBonus.value,
+      }),
+    });
+
+    if (!res.ok) throw new Error("Failed to update referral settings");
+
+    message.value = "Referral settings updated!";
+    messageType.value = "success";
+  } catch (err) {
+    console.error(err);
+    message.value = "Something went wrong.";
+    messageType.value = "error";
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
+
 
 
 <style scoped>

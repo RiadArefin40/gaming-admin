@@ -139,7 +139,7 @@ async function confirmAction() {
   const action = dialogAction.value; // 'approve' or 'reject'
 
   try {
-    const res = await fetch(`https://api.bajiraj.cloud/deposit/${depositId}/${action}`, {
+    const res = await fetch(`https://stage.api.bajiraj.com/deposit/${depositId}/${action}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"
@@ -147,17 +147,17 @@ async function confirmAction() {
     });
 
     const data = await res.json();
-
+    const res1 = await markAsRead(depositId);
+    console.log('res', res)
     if (!res.ok) {
       // Handle error from backend
       alert(data.error || "Failed to update deposit status");
       return;
     }
-
+    
     // Update local state with updated deposit from backend
-    const index = transactions.value.findIndex(t => t.id === depositId);
-    if (index !== -1) transactions.value[index] = { ...transactions.value[index], ...data.deposit };
 
+   await fetchTransactions()
     dialog.value = false;
     selectedTransaction.value = null;
     dialogAction.value = "";
@@ -173,7 +173,7 @@ async function confirmAction() {
 async function fetchTransactions() {
   loading.value = true;
   try {
-    const res = await fetch("https://api.bajiraj.cloud/deposit"); // Replace with real endpoint
+    const res = await fetch("https://stage.api.bajiraj.com/deposit"); // Replace with real endpoint
     transactions.value = await res.json();
   } catch (err) {
     console.error("Failed to fetch transactions:", err);
@@ -183,6 +183,84 @@ async function fetchTransactions() {
 }
 
 onMounted(() => fetchTransactions());
+const markAsRead = async (notif) => {
+  try {
+    const { error } = await useFetch(`https://stage.api.bajiraj.com/deposit/admin/notifications/${notif}/read`, {
+      method: "PATCH",
+    });
+
+    if (error.value) {
+      console.error("Failed to mark notification as read:", error.value);
+      return;
+    }
+
+    notif.read = true;
+    unreadCount.value = notifications.value.filter(n => !n.read).length;
+  } catch (err) {
+    console.error("Failed to mark notification as read:", err);
+  }
+};
+
+
+const withdrawNotifications = ref([]);
+const unreadWithdrawCount = ref(0);
+const withdrawModal = ref(false);
+
+// const token = localStorage.getItem("access_token");
+
+// Fetch withdrawal notifications
+const fetchWithdrawNotifications = async () => {
+  try {
+    const { data, error } = await useFetch("https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications?unread=true", {
+      method: "GET",
+      // headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!error.value && data.value) {
+      withdrawNotifications.value = data.value.notifications;
+      unreadWithdrawCount.value = withdrawNotifications.value.filter(n => !n.read).length;
+    }
+  } catch (err) {
+    console.error("Failed to fetch withdrawal notifications:", err);
+  }
+};
+
+// Mark single notification as read
+const markWithdrawAsRead = async (notif) => {
+  try {
+    await useFetch(`https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
+      method: "PATCH",
+    });
+
+    notif.read = true;
+    unreadWithdrawCount.value = withdrawNotifications.value.filter(n => !n.read).length;
+  } catch (err) {
+    console.error("Failed to mark withdrawal notification as read:", err);
+  }
+};
+
+// Mark all as read
+const markAllWithdrawRead = async () => {
+  try {
+    for (const notif of withdrawNotifications.value.filter(n => !n.read)) {
+      await useFetch(`https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
+        method: "PATCH",
+      });
+      notif.read = true;
+    }
+    unreadWithdrawCount.value = 0;
+  } catch (err) {
+    console.error("Failed to mark all withdrawal notifications as read:", err);
+  }
+};
+
+onMounted(() => {
+  fetchWithdrawNotifications();
+
+  setInterval(() => {
+    fetchWithdrawNotifications();
+  }, 15000); // auto-refresh every 15s
+});
 </script>
 
 <style scoped>

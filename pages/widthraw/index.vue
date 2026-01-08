@@ -103,7 +103,7 @@ const dialogAction = ref("");
 
 // Fetch withdrawals from backend
 async function fetchWithdrawals() {
-  const res = await fetch("https://api.bajiraj.cloud/withdrawals");
+  const res = await fetch("https://stage.api.bajiraj.com/withdrawals");
   withdrawals.value = await res.json();
 }
 
@@ -134,11 +134,11 @@ async function confirmAction() {
   if (!selectedWithdrawal.value) return;
 
   const action = dialogAction.value;
-  const res = await fetch(`https://api.bajiraj.cloud/withdrawals/${selectedWithdrawal.value.id}/${action}`, {
+  const res = await fetch(`https://stage.api.bajiraj.com/withdrawals/${selectedWithdrawal.value.id}/${action}`, {
     method: "PATCH",
   });
   const data = await res.json();
-
+  await markWithdrawAsRead(selectedWithdrawal.value.id)
   // Update locally
   const index = withdrawals.value.findIndex(w => w.id == selectedWithdrawal.value.id);
   if (index !== -1) withdrawals.value[index] = data.withdrawal;
@@ -151,6 +151,19 @@ async function confirmAction() {
 onMounted(() => {
   fetchWithdrawals();
 });
+
+const markWithdrawAsRead = async (notif) => {
+  try {
+    await useFetch(`https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications/${notif}/read`, {
+      method: "PATCH",
+    });
+
+    notif.read = true;
+    unreadWithdrawCount.value = withdrawNotifications.value.filter(n => !n.read).length;
+  } catch (err) {
+    console.error("Failed to mark withdrawal notification as read:", err);
+  }
+};
 </script>
 
 
