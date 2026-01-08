@@ -138,7 +138,7 @@ async function confirmAction() {
     method: "PATCH",
   });
   const data = await res.json();
-
+  await markWithdrawAsRead(selectedWithdrawal.value.id)
   // Update locally
   const index = withdrawals.value.findIndex(w => w.id == selectedWithdrawal.value.id);
   if (index !== -1) withdrawals.value[index] = data.withdrawal;
@@ -151,6 +151,19 @@ async function confirmAction() {
 onMounted(() => {
   fetchWithdrawals();
 });
+
+const markWithdrawAsRead = async (notif) => {
+  try {
+    await useFetch(`https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications/${notif}/read`, {
+      method: "PATCH",
+    });
+
+    notif.read = true;
+    unreadWithdrawCount.value = withdrawNotifications.value.filter(n => !n.read).length;
+  } catch (err) {
+    console.error("Failed to mark withdrawal notification as read:", err);
+  }
+};
 </script>
 
 

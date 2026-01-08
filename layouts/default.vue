@@ -78,13 +78,53 @@
 
     <p class="menu-section">FINANCE</p>
 
-    <NuxtLink to="/transactions">
-      <v-list-item prepend-icon="mdi-bank-transfer" title="Deposits" class="menu-item" />
-    </NuxtLink>
+<NuxtLink to="/transactions" class="d-flex align-center">
+  <v-badge
+    :content="unreadCount"
+    color="red"
+    overlap
+    v-if="unreadCount > 0"
+  >
+    <v-list-item
+      prepend-icon="mdi-bank-transfer"
+      title="Deposits"
+      class="menu-item"
+    />
+  </v-badge>
 
-    <NuxtLink to="/widthraw">
-      <v-list-item prepend-icon="mdi-cash" title="Cashout Requests" class="menu-item" />
-    </NuxtLink>
+  <!-- If no unread, just show list item normally -->
+  <v-list-item
+    v-else
+    prepend-icon="mdi-bank-transfer"
+    title="Deposits"
+    class="menu-item"
+  />
+</NuxtLink>
+
+
+  <NuxtLink to="/widthraw" class="d-flex align-center">
+  <v-badge
+    :content="unreadWithdrawCount"
+    color="orange"
+    overlap
+    v-if="unreadWithdrawCount > 0"
+  >
+    <v-list-item
+      prepend-icon="mdi-cash"
+      title="Cashout Requests"
+      class="menu-item"
+    />
+  </v-badge>
+
+  <!-- If no unread, just show list item normally -->
+  <v-list-item
+    v-else
+    prepend-icon="mdi-cash"
+    title="Cashout Requests"
+    class="menu-item"
+  />
+</NuxtLink>
+
 
   </v-list>
 </v-navigation-drawer>
@@ -97,15 +137,68 @@
   <v-spacer />
 
   <!-- Language -->
-  <v-menu>
-    <template #activator="{ props }">
-      <v-btn v-bind="props" icon="mdi-web" />
-    </template>
-    <v-list>
-      <v-list-item @click="changeLocale('en')">English</v-list-item>
-      <v-list-item @click="changeLocale('ar')">Arabic</v-list-item>
+<!-- Notifications -->
+<v-menu v-model="notificationsModal" bottom right transition="scale-transition">
+  <template #activator="{ props }">
+    <v-btn v-bind="props" icon>
+      <v-badge
+        :content="unreadCount"
+        color="red"
+        overlap
+        v-if="unreadCount > 0"
+      >
+        <v-icon size="28">mdi-bell</v-icon>
+      </v-badge>
+      <v-icon size="28" v-else>mdi-bell-outline</v-icon>
+    </v-btn>
+  </template>
+
+  <v-card class="notifications-card">
+    <v-card-title class="d-flex justify-space-between align-center">
+      <span class="text-h6">Notifications</span>
+      <v-btn text small color="primary" @click="markAllRead">
+        Mark all as read
+      </v-btn>
+    </v-card-title>
+
+    <v-divider></v-divider>
+
+    <v-list dense class="notifications-list">
+      <v-list-item
+        v-for="notif in notifications"
+        :key="notif.id"
+        @click="markAsRead(notif)"
+        class="notification-item"
+        :class="{'notification-unread': !notif.read}"
+      >
+        <v-list-item-avatar>
+          <v-icon color="primary">mdi-bell-ring</v-icon>
+        </v-list-item-avatar>
+
+        <v-list-item-content>
+          <v-list-item-title class="text-body-1">
+            {{ notif.message }}
+          </v-list-item-title>
+          <v-list-item-subtitle class="text-caption grey--text">
+            {{ new Date(notif.created_at).toLocaleString() }}
+          </v-list-item-subtitle>
+        </v-list-item-content>
+
+        <v-list-item-icon v-if="!notif.read">
+          <v-icon color="red">mdi-circle-small</v-icon>
+        </v-list-item-icon>
+      </v-list-item>
+
+      <v-list-item v-if="notifications.length === 0">
+        <v-list-item-content class="text-center grey--text">
+          No new notifications
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
-  </v-menu>
+  </v-card>
+</v-menu>
+
+
 
   <!-- User -->
   <v-menu>
@@ -220,35 +313,129 @@ async function handleSignOut() {
   }
 }
 
-const loadLocationData = async () => {
-  try {
-    locationBtnLoading.value = true;
-    const response = await useFetch(`${url}/admin/locations?page=-1&per_page=-1`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const locations = response?.data?.value?.data;
-    if (locations) {
-      locations.forEach((element) => {
-        allLocations.push({
-          lat: element.latitude,
-          lng: element.longitude,
-        });
-      });
-    }
-    locationBtnLoading.value  = false;
-  } catch (error) {
-    console.error("Login failed. Here's the raw error:", error);
-  }
-};
+
 const showLocation = async () => {
   seeLocation.value = true;
   await loadLocationData() 
 };
+
+
+
+// Notifications
+const notifications = ref([]);
+const unreadCount = ref(0);
+const notificationsModal = ref(false);
+
+
+
+const fetchNotifications = async () => {
+  try {
+    const { data, error } = await useFetch("https://stage.api.bajiraj.com/deposit/admin/notifications?unread=true", {
+      method: "GET",
+    });
+
+    if (error.value) {
+      console.error("Failed to fetch notifications:", error.value);
+      return;
+    }
+
+    notifications.value = data.value.notifications;
+    unreadCount.value = notifications.value.filter(n => !n.read).length;
+  } catch (err) {
+    console.error("Failed to fetch notifications:", err);
+  }
+};
+
+// Mark a notification as read
+const markAsRead = async (notif) => {
+  try {
+    const { error } = await useFetch(`https://stage.api.bajiraj.com/deposit/admin/notifications/${notif.id}/read`, {
+      method: "PATCH",
+    });
+
+    if (error.value) {
+      console.error("Failed to mark notification as read:", error.value);
+      return;
+    }
+
+    notif.read = true;
+    unreadCount.value = notifications.value.filter(n => !n.read).length;
+  } catch (err) {
+    console.error("Failed to mark notification as read:", err);
+  }
+};
+
+onMounted(fetchNotifications);
+
+
+// Run fetch only on client
 onMounted(() => {
-  loadLocationData();
+  fetchNotifications();
+
+  // Auto-refresh every 15s
+  setInterval(() => {
+    fetchNotifications();
+  }, 10000);
+});
+
+const withdrawNotifications = ref([]);
+const unreadWithdrawCount = ref(0);
+const withdrawModal = ref(false);
+
+
+
+// Fetch withdrawal notifications
+const fetchWithdrawNotifications = async () => {
+  try {
+    const { data, error } = await useFetch("https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications?unread=true", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!error.value && data.value) {
+      withdrawNotifications.value = data.value.notifications;
+      unreadWithdrawCount.value = withdrawNotifications.value.filter(n => !n.read).length;
+    }
+  } catch (err) {
+    console.error("Failed to fetch withdrawal notifications:", err);
+  }
+};
+
+// Mark single notification as read
+const markWithdrawAsRead = async (notif) => {
+  try {
+    await useFetch(`https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
+      method: "PATCH",
+    });
+
+    notif.read = true;
+    unreadWithdrawCount.value = withdrawNotifications.value.filter(n => !n.read).length;
+  } catch (err) {
+    console.error("Failed to mark withdrawal notification as read:", err);
+  }
+};
+
+// Mark all as read
+const markAllWithdrawRead = async () => {
+  try {
+    for (const notif of withdrawNotifications.value.filter(n => !n.read)) {
+      await useFetch(`https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
+        method: "PATCH",
+      });
+      notif.read = true;
+    }
+    unreadWithdrawCount.value = 0;
+  } catch (err) {
+    console.error("Failed to mark all withdrawal notifications as read:", err);
+  }
+};
+
+onMounted(() => {
+  fetchWithdrawNotifications();
+
+  setInterval(() => {
+    fetchWithdrawNotifications();
+  }, 10000); // auto-refresh every 15s
 });
 </script>
 
@@ -433,6 +620,36 @@ onMounted(() => {
     transform: translateY(0);
   }
 }
+
+.notifications-card {
+  width: 450px;
+  max-height: 450px;
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.notifications-list {
+  padding: 0;
+}
+
+.notification-item {
+  cursor: pointer;
+  transition: background 0.2s ease;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.notification-item:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.notification-unread {
+  background-color: rgba(0, 123, 255, 0.1);
+  font-weight: 600;
+  border-left: 4px solid #1976d2;
+}
+
 
 
 </style>
