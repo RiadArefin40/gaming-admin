@@ -70,7 +70,7 @@ async function  handleLogin() {
   loading.value = true;
 
    try {
-   const res = await fetch("https://stage.api.bajiraj.com/auth/login", {
+   const res = await fetch("https://api.bajiraj.cloud/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

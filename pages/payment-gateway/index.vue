@@ -205,16 +205,16 @@ const activeGateway = ref({});
 
 // Load current value
 const loadSetting = async () => {
-  const res = await axios.get("https://stage.api.bajiraj.com/payment-gateways/auto-payment");
+  const res = await axios.get("https://api.bajiraj.cloud/payment-gateways/auto-payment");
   enabled.value = res.data.auto_payment_enabled;
 
-    const res1 = await axios.get("https://stage.api.bajiraj.com/payment-gateways/widthraw");
+    const res1 = await axios.get("https://api.bajiraj.cloud/payment-gateways/widthraw");
   enabledCashout.value = res1.data.widthraw;
 };
 
 const toggle = async () => {
   try {
-    await axios.post("https://stage.api.bajiraj.com/payment-gateways/auto-payment", {
+    await axios.post("https://api.bajiraj.cloud/payment-gateways/auto-payment", {
       enabled: enabled.value
     });
     console.log(`Global auto payment is now ${enabled.value ? "ON" : "OFF"}`);
@@ -225,7 +225,7 @@ const toggle = async () => {
 
 const toggleCashout = async () => {
   try {
-    await axios.post("https://stage.api.bajiraj.com/payment-gateways/widthraw", {
+    await axios.post("https://api.bajiraj.cloud/payment-gateways/widthraw", {
       enabled: enabledCashout.value
     });
     console.log(`Global auto payment is now ${enabledCashout.value ? "ON" : "OFF"}`);
@@ -238,7 +238,7 @@ onMounted(loadSetting);
 
 
 const fetchGateways = async () => {
-  const { data } = await axios.get("https://stage.api.bajiraj.com/payment-gateways/");
+  const { data } = await axios.get("https://api.bajiraj.cloud/payment-gateways/");
   gateways.value = data;
 };
 
@@ -246,7 +246,7 @@ onMounted(fetchGateways);
 
 // Add new gateway
 async function addGateway() {
-  await axios.post("https://stage.api.bajiraj.com/payment-gateways", gatewayForm.value);
+  await axios.post("https://api.bajiraj.cloud/payment-gateways", gatewayForm.value);
   dialogCreate.value = false;
   gatewayForm.value = {
     name: "",
@@ -266,7 +266,7 @@ function openEditDialog(gateway) {
 
 async function updateGateway() {
   await axios.put(
-    `https://stage.api.bajiraj.com/payment-gateways/${activeGateway.value.id}`,
+    `https://api.bajiraj.cloud/payment-gateways/${activeGateway.value.id}`,
     activeGateway.value
   );
   dialogEdit.value = false;
@@ -276,7 +276,7 @@ async function updateGateway() {
 
 // Delete gateway
 async function deleteGateway(gateway) {
-  await axios.delete(`https://stage.api.bajiraj.com/payment-gateways/${gateway.id}`);
+  await axios.delete(`https://api.bajiraj.cloud/payment-gateways/${gateway.id}`);
   fetchGateways();
 }
 

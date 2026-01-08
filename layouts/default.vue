@@ -330,7 +330,7 @@ const notificationsModal = ref(false);
 
 const fetchNotifications = async () => {
   try {
-    const { data, error } = await useFetch("https://stage.api.bajiraj.com/deposit/admin/notifications?unread=true", {
+    const { data, error } = await useFetch("https://api.bajiraj.cloud/deposit/admin/notifications?unread=true", {
       method: "GET",
     });
 
@@ -349,7 +349,7 @@ const fetchNotifications = async () => {
 // Mark a notification as read
 const markAsRead = async (notif) => {
   try {
-    const { error } = await useFetch(`https://stage.api.bajiraj.com/deposit/admin/notifications/${notif.id}/read`, {
+    const { error } = await useFetch(`https://api.bajiraj.cloud/deposit/admin/notifications/${notif.id}/read`, {
       method: "PATCH",
     });
 
@@ -387,7 +387,7 @@ const withdrawModal = ref(false);
 // Fetch withdrawal notifications
 const fetchWithdrawNotifications = async () => {
   try {
-    const { data, error } = await useFetch("https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications?unread=true", {
+    const { data, error } = await useFetch("https://api.bajiraj.cloud/withdrawals/admin/withdraw_notifications?unread=true", {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -404,7 +404,7 @@ const fetchWithdrawNotifications = async () => {
 // Mark single notification as read
 const markWithdrawAsRead = async (notif) => {
   try {
-    await useFetch(`https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
+    await useFetch(`https://api.bajiraj.cloud/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
       method: "PATCH",
     });
 
@@ -419,7 +419,7 @@ const markWithdrawAsRead = async (notif) => {
 const markAllWithdrawRead = async () => {
   try {
     for (const notif of withdrawNotifications.value.filter(n => !n.read)) {
-      await useFetch(`https://stage.api.bajiraj.com/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
+      await useFetch(`https://api.bajiraj.cloud/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
         method: "PATCH",
       });
       notif.read = true;

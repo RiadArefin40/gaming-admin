@@ -80,17 +80,17 @@ const messageType = ref("");
 onMounted(async () => {
   try {
     // HEADLINE
-    const resHeadline = await fetch("https://stage.api.bajiraj.com/users/headline");
+    const resHeadline = await fetch("https://api.bajiraj.cloud/users/headline");
     const dataHeadline = await resHeadline.json();
     title.value = dataHeadline.title || "";
 
     // FETCH DELAY from system settings
-    const resDelay = await fetch("https://stage.api.bajiraj.com/withdrawals/system/settings/turnover-delay");
+    const resDelay = await fetch("https://api.bajiraj.cloud/withdrawals/system/settings/turnover-delay");
     const dataDelay = await resDelay.json();
     delayTime.value = dataDelay.turnover_delay || 0;
 
     // FETCH REFERRAL SETTINGS
-    const resReferral = await fetch("https://stage.api.bajiraj.com/users/referral-setting");
+    const resReferral = await fetch("https://api.bajiraj.cloud/users/referral-setting");
     const dataReferral = await resReferral.json();
     referralBonus.value = dataReferral.referred_bonus || 0;
     ownerBonus.value = dataReferral.owner_bonus || 0;
@@ -111,7 +111,7 @@ const updateHeadline = async () => {
   message.value = "";
 
   try {
-    const res = await fetch("https://stage.api.bajiraj.com/users/headline", {
+    const res = await fetch("https://api.bajiraj.cloud/users/headline", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: title.value }),
@@ -135,7 +135,7 @@ const updateTurnover = async () => {
   message.value = "";
 
   try {
-    await fetch("https://stage.api.bajiraj.com/withdrawals/system/settings/turnover-delay", {
+    await fetch("https://api.bajiraj.cloud/withdrawals/system/settings/turnover-delay", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ value: delayTime.value }),
@@ -158,7 +158,7 @@ const updateReferral = async () => {
   message.value = "";
 
   try {
-    const res = await fetch("https://stage.api.bajiraj.com/users/referral-setting", {
+    const res = await fetch("https://api.bajiraj.cloud/users/referral-setting", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
