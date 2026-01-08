@@ -258,11 +258,31 @@ const stats = computed(() => {
   
   const totalWit = filteredWithdrawals.value.filter(w => w.status === "approved").reduce((a, b) => a + +b.amount, 0)
   const netProfit = totalDep - totalWit
+  const withdrawableBalance = computed(() => {
+  const approvedDeposit = filteredDeposits.value
+    .filter(d => d.status === "approved")
+    .reduce(
+      (sum, d) => sum + Number(d.amount) - Number(d.bonus_amount || 0),
+      0
+    );
+
+  const approvedWithdraw = filteredWithdrawals.value
+    .filter(w => w.status === "approved")
+    .reduce((sum, w) => sum + Number(w.amount), 0);
+
+  return Math.max(0, approvedDeposit - approvedWithdraw);
+
+});
+
 
   return [
     { label: "Total Deposit", value: totalDep, color: "green" },
      { label: "Total Bonus", value: totalDepBonus, color: "red" },
     { label: "Total Withdraw", value: totalWit, color: "red" },
+      {
+    label: "Withdrawable Balance",
+    value: withdrawableBalance.value
+  },
     { label: "Net Profit", value: netProfit, color: netProfit >= 0 ? "green" : "red" },
     { label: "Transactions", value: filteredDeposits.value.length + filteredWithdrawals.value.length, color: "purple" }
   ]
