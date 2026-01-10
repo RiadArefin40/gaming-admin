@@ -128,7 +128,8 @@
           <v-text-field label="Phone" v-model="activeUser.phone" outlined />
           <v-text-field label="Password" v-model="activeUser.password" outlined />
           <!-- <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="activeUser.role" outlined /> -->
-          <v-text-field v-if="currentUserRole == ''" label="Balance" v-model.number="activeUser.wallet"
+               {{ currentUserRole }}
+          <v-text-field v-if="currentUserRole == 'admin' && activeUser.role != 'admin'" label="Balance" v-model.number="activeUser.wallet"
             type="number" outlined />
         </v-card-text>
 

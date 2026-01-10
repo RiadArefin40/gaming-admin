@@ -117,8 +117,9 @@
         <v-card-text class="d-flex flex-column gap-4">
           <v-text-field label="Username" v-model="activeUser.name" outlined />
           <v-text-field label="Phone" v-model="activeUser.phone" outlined />
-          <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="activeUser.role" outlined />
-          <v-text-field v-if="currentUserRole === 'admin'" label="Balance" v-model.number="activeUser.wallet"
+          <!-- <v-select label="Role" :items="['user', 'agent', 'admin']" v-model="activeUser.role" outlined /> -->
+      
+          <v-text-field v-if="currentUserRole == 'admin'" label="Balance" v-model.number="activeUser.wallet"
             type="number" outlined />
         </v-card-text>
 
@@ -292,14 +293,17 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 
-const currentUserRole = ref("admin");
+
 
 
 const dialogTransaction = ref(false)
 const loadingTransactions = ref(false)
 
 const activeTab = ref("deposit")
-
+const user = process.client
+  ? JSON.parse(localStorage.getItem("auth_user"))
+  : null;
+const currentUserRole = user?.role || (user ? user.role : null);
 
 const deposits = ref([])
 const withdrawals = ref([])

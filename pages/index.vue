@@ -2,9 +2,23 @@
   <div class="dashboard p-4">
 
     <!-- HEADER -->
-<header class=" mb-4 compact">
+<!-- HEADER -->
+<header class="mb-4 compact flex gap-4 flex-col md:flex-row">
+  <!-- BALANCE CARD (for non-admins) -->
+  <div v-if="currentUserRole !== 'admin'" class="mb-4">
+    <v-card class="pa-4 rounded-xl elevation-3 flex items-center justify-between max-w-[300px]">
+      <div>
+         <v-icon color="green" size="32">mdi-wallet</v-icon>
+        <span class="text-gray-500 text-xl ml-2 pt-2">Agent Balance</span>
+             
+        <h2 class="text-2xl font-bold">৳{{ user?.wallet || 0.00 }}</h2>
+      </div>
+
+    </v-card>
+  </div>
+
   <!-- DATE FILTER -->
-  <div class="date-filter-pill compact">
+  <div class="date-filter-pill compact flex items-center gap-2 h-10">
     <div class="pill-input">
       <i class="mdi mdi-calendar-start"></i>
       <input type="date" v-model="filterStart" />
@@ -26,6 +40,7 @@
     </button>
   </div>
 </header>
+
 
 <div class="flex flex-col md:flex-row gap-6">
 
@@ -187,7 +202,12 @@ const headers = [
 
 // Transaction tab: All / Deposit / Withdraw
 const transactionTab = ref('All')
+const user = process.client
+  ? JSON.parse(localStorage.getItem("auth_user"))
+  : null;
+const currentUserRole = user?.role || (user ? user.role : null);
 
+console.log('userrrrr', user)
 // ---------- FETCH ----------
 const fetchData = async () => {
   loading.value = true
@@ -316,6 +336,38 @@ const displayedTransactions = computed(() => {
   if (transactionTab.value === 'All') return filteredTransactions.value
   return filteredTransactions.value.filter(t => t.type === transactionTab.value)
 })
+
+const mybal = ref(0)
+
+const fetchWithdrawNotifications = async () => {
+  const userId = user?.id;
+  console.log('userid', userId)
+  if (userId){
+      try {
+    const { data, error } = await useFetch(`https://api.bajiraj.cloud/users/${userId}/balance`, {
+      method: "GET",
+    });
+   console.log('balance', data)
+    if (!error.value && data.value) {
+      mybal.value = data.value.balance;
+
+    }
+  } catch (err) {
+    console.error("Failed to fetch withdrawal notifications:", err);
+  }
+  console.log('user', user)
+
+  }
+
+};
+
+onMounted(() => {
+  fetchWithdrawNotifications();
+
+  setInterval(() => {
+    fetchWithdrawNotifications();
+  }, 10000); // auto-refresh every 15s
+});
 </script>
 
 <style>
@@ -869,7 +921,7 @@ display: grid;
     0 6px 16px rgba(0, 0, 0, 0.05),
     inset 0 0 0 1px rgba(0, 0, 0, 0.04);
   transition: transform 0.2s ease;
-  height: 80px;
+  height: 100px;
 }
 
 .summary-card:hover {

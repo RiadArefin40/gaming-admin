@@ -91,6 +91,8 @@ async function  handleLogin() {
         JSON.stringify({
            username: data.user.name,
            role: data.user.role,
+           wallet:data.user.wallet,
+           id:data.user.id,
            loggedIn: true,
         })
       );
