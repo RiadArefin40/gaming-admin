@@ -39,7 +39,7 @@
             color="green"
             class="text-white mr-2"
             small
-            @click="openApprovalDialog(item, 'approve')"
+            @click="openApprovalDialog(item, 'approved')"
           >
             Approve
           </v-btn>
@@ -48,7 +48,7 @@
             color="red"
             class="text-white"
             small
-            @click="openApprovalDialog(item, 'reject')"
+            @click="openApprovalDialog(item, 'rejectd')"
           >
             Reject
           </v-btn>

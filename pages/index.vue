@@ -113,6 +113,12 @@
   <template #item.user_id="{ item }">
     #{{ item.user_id }}
   </template>
+  <template #item.actions="{ item }">
+  <v-btn small color="primary" @click="fetchDepositActions(item.id)">
+    Details
+  </v-btn>
+</template>
+
 
   <!-- Amount -->
   <template #item.amount="{ item }">
@@ -141,6 +147,33 @@
     </div>
   </template>
 </v-data-table>
+<v-dialog v-model="dialogActionHistory" max-width="600">
+  <v-card class="pa-6 rounded-2xl elevation-5">
+    <v-card-title>Deposit Action History</v-card-title>
+    <v-divider />
+    <v-table dense>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>By</th>
+          <th>Amount</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="a in actionHistory" :key="a.id">
+          <td>{{ a.action_type }}</td>
+          <td>{{ a.action_by }}</td>
+          <td>৳{{ a.action_amount }}</td>
+          <td>{{ new Date(a.created_at).toLocaleString() }}</td>
+        </tr>
+        <tr v-if="actionHistory.length === 0">
+          <td colspan="4" class="text-center text-grey">No action history</td>
+        </tr>
+      </tbody>
+    </v-table>
+  </v-card>
+</v-dialog>
 
 
       <!-- <table v-else class="transactions-table">
@@ -197,6 +230,7 @@ const headers = [
   { title: "Amount", value: "amount" },
     { title: "Bonus", value: "bonus_amount" },
   { title: "Status", value: "status" },
+    { title: "Triggered By", value: "actions", sortable: false }
 ];
 
 
@@ -206,7 +240,8 @@ const user = process.client
   ? JSON.parse(localStorage.getItem("auth_user"))
   : null;
 const currentUserRole = user?.role || (user ? user.role : null);
-
+const dialogActionHistory = ref(false);
+const actionHistory = ref([]);
 console.log('userrrrr', user)
 // ---------- FETCH ----------
 const fetchData = async () => {
@@ -227,6 +262,16 @@ const fetchData = async () => {
   } finally {
     loading.value = false
     applyFilter()
+  }
+}
+
+async function fetchDepositActions(depositId) {
+  try {
+    const res = await fetch(`https://api.bajiraj.cloud/deposit/${depositId}/actions`);
+    actionHistory.value = await res.json();
+    dialogActionHistory.value = true;
+  } catch (err) {
+    console.error(err);
   }
 }
 
