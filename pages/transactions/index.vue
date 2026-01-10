@@ -124,6 +124,11 @@ const filteredTransactions = computed(() =>
   )
 );
 
+const user = process.client
+  ? JSON.parse(localStorage.getItem("auth_user"))
+  : null;
+const currentUserRole = user?.role || (user ? user.role : null);
+
 // Open dialog
 function openApprovalDialog(transaction, action) {
   selectedTransaction.value = transaction;
@@ -137,36 +142,52 @@ async function confirmAction() {
 
   const depositId = selectedTransaction.value.id;
   const action = dialogAction.value; // 'approve' or 'reject'
-
+  if(user?.id){
   try {
+    // 1️⃣ Call backend to approve/reject
     const res = await fetch(`https://api.bajiraj.cloud/deposit/${depositId}/${action}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json"
-      }
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        // optional: send ownerId if needed
+        ownerId: user?.id,
+        actionBy: user?.username, 
+      })
     });
 
     const data = await res.json();
-    const res1 = await markAsRead(depositId);
-    console.log('res', res)
+
     if (!res.ok) {
-      // Handle error from backend
       alert(data.error || "Failed to update deposit status");
       return;
     }
-    
-    // Update local state with updated deposit from backend
 
-   await fetchTransactions()
+    // 2️⃣ Mark deposit as read (optional notification handling)
+    try {
+      await markAsRead(depositId);
+    } catch (err) {
+      console.warn("Failed to mark as read", err);
+    }
+
+    // 3️⃣ Refresh local deposits state
+    await fetchTransactions();
+
+    // 4️⃣ Reset dialog
     dialog.value = false;
     selectedTransaction.value = null;
     dialogAction.value = "";
 
+    // Optional success message
+    alert(data.message || "Deposit status updated successfully");
+
   } catch (err) {
-    console.error(err);
+    console.error("Error updating deposit:", err);
     alert("Something went wrong while updating deposit status");
   }
+  }
+
 }
+
 
 
 // Fetch deposits from backend

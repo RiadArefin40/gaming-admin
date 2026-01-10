@@ -11,7 +11,7 @@
          <v-icon color="green" size="32">mdi-wallet</v-icon>
         <span class="text-gray-500 text-xl ml-2 pt-2">Agent Balance</span>
              
-        <h2 class="text-2xl font-bold">৳{{ user?.wallet || 0.00 }}</h2>
+        <h2 class="text-2xl font-bold">৳{{ mybal || 0.00 }}</h2>
       </div>
 
     </v-card>
