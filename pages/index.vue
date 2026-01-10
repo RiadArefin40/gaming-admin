@@ -162,8 +162,17 @@
       </thead>
       <tbody>
         <tr v-for="a in actionHistory" :key="a.id">
-          <td>{{ a.action_type }}</td>
-          <td>{{ a.action_by }}</td>
+          <!-- <td>{{ a.action_type }}</td> -->
+          <td>    <span
+      :class="{
+        'status-ok': a.action_type === 'approved',
+        'status-warn': a.action_type === 'processing',
+        'status-bad': a.action_type === 'failed' || a.action_type === 'rejected'
+      }"
+    >
+      {{ a.action_type }}
+    </span></td>
+          <td> <span class="text-lg font-bold">{{ a.action_by }}</span></td>
           <td>৳{{ a.action_amount }}</td>
           <td>{{ new Date(a.created_at).toLocaleString() }}</td>
         </tr>
