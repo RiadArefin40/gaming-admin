@@ -191,7 +191,7 @@
             <tr>
               <th>Date</th>
               <th>Amount</th>
-              <th>Status</th>
+           
               <th>Gateway</th>
             </tr>
           </thead>
@@ -221,32 +221,55 @@
 
 
     <!-- BETTING DIALOG -->
-    <v-dialog v-model="dialogBetting" max-width="700">
-      <v-card class="pa-6 rounded-2xl elevation-5">
-        <v-card-title class="d-flex align-center">
-          Betting Record
-          <v-spacer />
-          <v-text-field v-model="bettingSearch" placeholder="Search betting..." density="compact"
-            prepend-inner-icon="mdi-magnify" hide-details rounded style="max-width: 220px" />
-        </v-card-title>
+  <v-dialog v-model="dialogBetting" max-width="800">
+    <v-card class="pa-6 rounded-2xl elevation-5">
+      
+      <v-card-title class="d-flex align-center">
+        Betting Record
+        <v-spacer />
+        <v-text-field
+          v-model="bettingSearch"
+          placeholder="Search betting..."
+          density="compact"
+          prepend-inner-icon="mdi-magnify"
+          hide-details
+          rounded
+          style="max-width: 220px"
+        />
+      </v-card-title>
 
-        <v-divider />
-        <v-table v-if="!loadingBettings" density="compact" class="mt-4">
-          <tbody>
-            <tr v-for="(b, i) in filteredBettings" :key="i">
-              <td>{{ b.game }}</td>
-              <td>৳{{ b.bet }}</td>
-              <td :class="b.result === 'Win' ? 'text-green' : 'text-red'">
-                {{ b.result }}
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+      <v-divider />
 
-        <v-skeleton-loader v-else type="table" class="mt-4" />
+      <!-- BET TYPE TABS -->
+      <v-tabs v-model="activeBetType" class="mt-4">
+        <v-tab v-for="type in betTypes" :key="type" :value="type">{{ type }}</v-tab>
+      </v-tabs>
 
-      </v-card>
-    </v-dialog>
+      <!-- BETTING TABLE -->
+      <v-table v-if="!loadingBettings" density="compact" class="mt-4">
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Amount</th>
+            <!-- <th>Result</th> -->
+            <th>Date Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(b, i) in filteredBettings" :key="i">
+            <td>{{ b.bet_type }}</td>
+            <td>৳{{ b.amount }}</td>
+            <!-- <td :class="b.result === 'Win' ? 'text-green' : 'text-red'">
+              {{ b.result || 'Pending' }}
+            </td> -->
+            <td>{{ formatDate(b.created_at) }} - {{ formatDate(b.updated_at) }}</td>
+          </tr>
+        </tbody>
+      </v-table>
+
+      <v-skeleton-loader v-else type="table" class="mt-4" />
+    </v-card>
+  </v-dialog>
 
     <!-- DELETE DIALOG -->
     <v-dialog v-model="dialogDelete" max-width="420">
@@ -302,14 +325,14 @@ const dialogCreate = ref(false);
 const dialogEdit = ref(false);
 const dialogDetails = ref(false);
 
-const dialogBetting = ref(false);
+
 const dialogDelete = ref(false);
 
 // loading states
 const loadingUsers = ref(false);
 const loadingAction = ref(false);
 
-const loadingBettings = ref(false);
+
 
 // forms
 const createForm = ref({
@@ -328,6 +351,43 @@ const transactions = ref([]);
 const bettings = ref([]);
 
 const userSearch = ref("");
+
+const dialogBetting = ref(false);
+const loadingBettings = ref(false);
+
+const activeBetType = ref("All");
+
+const betTypes = ref(["All", "slot", "live", "sport"]); // Adjust according to your data
+
+// Fetch betting records
+async function fetchBettings(userId) {  
+  loadingBettings.value = true;
+  try {
+    const res = await fetch(`https://api.bajiraj.cloud/users/userbet/${userId}`);
+    bettings.value = await res.json();
+    dialogBetting.value = true;
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load bettings");
+  } finally {
+    loadingBettings.value = false;
+  }
+}
+
+// Filtered bettings by type & search
+const filteredBettings = computed(() => {
+  return bettings.value
+    .filter((b) => activeBetType.value === "All" || b.bet_type === activeBetType.value)
+    .filter((b) =>
+      bettingSearch.value
+        ? b.bet_type.toLowerCase().includes(bettingSearch.value.toLowerCase()) ||
+          b.amount.toString().includes(bettingSearch.value)
+        : true
+    );
+});
+
+// Format date using plain JS
+
 
 const filteredUsers = computed(() => {
   if (!userSearch.value) return roles.value;
@@ -481,18 +541,7 @@ async function toggleUserStatus(user) {
 // }
 
 // ---------------- BETTINGS ----------------
-async function fetchBettings(userId) {
-  loadingBettings.value = true;
-  try {
-    const res = await fetch(`https://api.bajiraj.cloud/users/${userId}/bettings`);
-    bettings.value = await res.json();
-    dialogBetting.value = true;
-  } catch {
-    alert("Failed to load bettings");
-  } finally {
-    loadingBettings.value = false;
-  }
-}
+
 
 // ---------------- HELPERS ----------------
 function openDialog(type, item) {
@@ -512,11 +561,7 @@ function openDialog(type, item) {
 //   )
 // );
 
-const filteredBettings = computed(() =>
-  bettings.value.filter((b) =>
-    Object.values(b).join(" ").toLowerCase().includes(bettingSearch.value.toLowerCase())
-  )
-);
+
 
 onMounted(fetchUsers);
 
