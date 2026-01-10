@@ -48,7 +48,7 @@
             color="red"
             class="text-white"
             small
-            @click="openApprovalDialog(item, 'rejectd')"
+            @click="openApprovalDialog(item, 'rejected')"
           >
             Reject
           </v-btn>
@@ -59,21 +59,21 @@
     <!-- APPROVAL DIALOG -->
     <v-dialog v-model="dialog" max-width="500">
       <v-card class="pa-6 rounded-2xl elevation-5 text-center">
-        <v-icon size="48" :color="dialogAction === 'approve' ? 'green' : 'red'">
-          {{ dialogAction === 'approve' ? 'mdi-check-circle' : 'mdi-close-circle' }}
+        <v-icon size="48" :color="dialogAction === 'approved' ? 'green' : 'red'">
+          {{ dialogAction === 'approved' ? 'mdi-check-circle' : 'mdi-close-circle' }}
         </v-icon>
-        <h3 class="mt-3">{{ dialogAction === 'approve' ? 'Approve' : 'Reject' }} Transaction</h3>
+        <h3 class="mt-3">{{ dialogAction === 'approved' ? 'Approve' : 'Reject' }} Transaction</h3>
         <p>User: <b>{{ selectedTransaction?.username }}</b></p>
         <p>Amount: <b>৳{{ selectedTransaction?.amount }}</b></p>
         <p v-if="selectedTransaction?.promo_code">Promo: <b>{{ selectedTransaction.promo_code }}</b></p>
         <v-card-actions class="justify-center mt-4">
           <v-btn variant="tonal" @click="dialog = false">Cancel</v-btn>
           <v-btn
-            :color="dialogAction === 'approve' ? 'green' : 'red'"
+            :color="dialogAction === 'approved' ? 'green' : 'red'"
             class="text-white"
             @click="confirmAction"
           >
-            {{ dialogAction === 'approve' ? 'Approve' : 'Reject' }}
+            {{ dialogAction === 'approved' ? 'Approve' : 'Reject' }}
           </v-btn>
         </v-card-actions>
       </v-card>
