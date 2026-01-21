@@ -110,15 +110,15 @@ const promoCodes = ref([]);
 const promoTypes = ["slot", "live-casino", "sports", "any"];
 
 async function fetchPromos() {
-  const res = await fetch("https://api.bajiraj.cloud/promos");
+  const res = await fetch("https://api-v2.bajiraj.cloud/promos");
   promoCodes.value = await res.json();
 }
 
 async function savePromo() {
   const method = editPromo.value ? "PUT" : "POST";
   const url = editPromo.value
-    ? `https://api.bajiraj.cloud/promos/${promoForm.value.id}`
-    : "https://api.bajiraj.cloud/promos";
+    ? `https://api-v2.bajiraj.cloud/promos/${promoForm.value.id}`
+    : "https://api-v2.bajiraj.cloud/promos";
 
   const res = await fetch(url, {
     method,
@@ -133,7 +133,7 @@ async function savePromo() {
 }
 
 async function deletePromo(item) {
-  await fetch(`https://api.bajiraj.cloud/promos/${item.id}`, {
+  await fetch(`https://api-v2.bajiraj.cloud/promos/${item.id}`, {
     method: "DELETE"
   });
 
@@ -141,7 +141,7 @@ async function deletePromo(item) {
 }
 
 async function toggleStatus(item) {
-  await fetch(`https://api.bajiraj.cloud/promos/${item.id}/toggle`, {
+  await fetch(`https://api-v2.bajiraj.cloud/promos/${item.id}/toggle`, {
     method: "PATCH"
   });
 
