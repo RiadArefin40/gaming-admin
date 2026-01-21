@@ -14,7 +14,7 @@
   <div class="drawer-header">
     <div class="logo-circle">BR</div>
     <div v-if="!rail" class="logo-text">
-      <h3>Bajiraj</h3>
+      <h3>CrownBaji</h3>
       <span>Admin Panel</span>
     </div>
   </div>
@@ -228,7 +228,7 @@
 
   <v-footer class="app-footer">
     <v-divider />
-    <div class="footer-text">© 2026 Bajiraj</div>
+    <div class="footer-text">© 2026 CrownBaji</div>
   </v-footer>
 </v-main>
 
