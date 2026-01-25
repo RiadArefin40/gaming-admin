@@ -69,7 +69,7 @@
   <div
     class="summary-value"
     :class="item.value >= 0 ? 'text-green' : 'text-red'"
-    :style="item.label === 'Withdrawable Balance' ? {
+    :style="item.label === 'Withdrawable' ? {
       display: 'inline-block',
       padding: '6px 14px',
       borderRadius: '999px',
@@ -366,12 +366,12 @@ const stats = computed(() => {
      { label: "Total Bonus", value: totalDepBonus, color: "red" },
     { label: "Total Withdraw", value: totalWit, color: "red" },
       {
-    label: "Withdrawable Balance",
+    label: "Est Balance",
     value: withdrawableBalance.value,
     color: "red"
   },
     { label: "Net Profit", value: netProfit, color: netProfit >= 0 ? "green" : "red" },
-    { label: "Transactions", value: filteredDeposits.value.length + filteredWithdrawals.value.length, color: "purple" }
+    { label: "Total Payment", value: filteredDeposits.value.length + filteredWithdrawals.value.length, color: "purple" }
   ]
 })
 
@@ -519,49 +519,22 @@ onMounted(() => {
   margin-bottom: 28px;
 }
 
-.stat-card {
-  padding: 22px;
-  border-radius: 20px;
-  background: #ffffff;
-  box-shadow:
-    0 15px 30px rgba(0, 0, 0, 0.05),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.04);
-  transition: all 0.25s ease;
-  position: relative;
-  overflow: hidden;
-}
 
-.stat-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    transparent,
-    rgba(99, 102, 241, 0.08)
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
 
-.stat-card:hover::after {
-  opacity: 1;
-}
 
-.stat-card:hover {
-  transform: translateY(-4px);
-}
 
-.stat-title {
+
+
+/* .stat-title {
   font-size: 13px;
-  color: #64748b;
-}
+  color: #ebeff3;
+} */
 
 .stat-value {
   font-size: 28px;
   font-weight: 700;
   margin-top: 6px;
-  color: #020617;
+  color: #dee0e6;
 }
 
 /* Color accents */
@@ -582,7 +555,7 @@ onMounted(() => {
 .summary-card {
   padding: 20px;
   border-radius: 18px;
-  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  background-color: rgba(0, 0, 0, 0.05) ;
   box-shadow:
     0 12px 28px rgba(0, 0, 0, 0.05),
     inset 0 0 0 1px rgba(0, 0, 0, 0.04);
@@ -899,9 +872,10 @@ onMounted(() => {
 }
 .stat-card {
   position: relative;
-  padding: 14px 16px;
+  padding: 64px 26px;
+  text-align: center;
   border-radius: 16px;
-  background: linear-gradient(180deg, #ffffff, #f8fafc);
+background: #3f3863;
   box-shadow:
     0 8px 20px rgba(0, 0, 0, 0.05),
     inset 0 0 0 1px rgba(0, 0, 0, 0.04);
@@ -931,10 +905,10 @@ onMounted(() => {
 
 /* Title */
 .stat-title {
-  font-size: 11px;
-  font-weight: 500;
-  color: #64748b;
-  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  /* text-transform: uppercase; */
   letter-spacing: 0.04em;
 }
 
@@ -943,7 +917,7 @@ onMounted(() => {
   font-size: 22px;
   font-weight: 700;
   margin-top: 4px;
-  color: #020617;
+  color: #ffffff;
 }
 .stat-card.green::before {
   background: linear-gradient(90deg, #22c55e, #4ade80);
@@ -962,20 +936,20 @@ onMounted(() => {
 }
 .summary-grid {
 display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
   margin-bottom: 18px;
 }
 .summary-card {
-  padding: 14px 16px;
+ padding: 44px 26px;
   border-radius: 14px;
   background: #3f3863;
-  
+  text-align: center;
   box-shadow:
     0 6px 16px rgba(0, 0, 0, 0.05),
     inset 0 0 0 1px rgba(0, 0, 0, 0.04);
   transition: transform 0.2s ease;
-  height: 100px;
+
 }
 
 .summary-card:hover {
@@ -984,13 +958,13 @@ display: grid;
 
 /* Title */
 .summary-title {
-  font-size: 16px;
-  color: #ebedf0;
+  font-size: 28px;
+  color: #ffffff;
 }
 
 /* Value */
 .summary-value {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 700;
   margin-top: 6px;
 }
