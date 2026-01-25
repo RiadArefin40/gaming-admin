@@ -37,7 +37,7 @@
 
 
         <div  class="bg-slate-200 p-2" >
-          <div class="text-2xl">Whatsapp</div>
+          <div class="text-2xl">Whatsapp-SMS</div>
           <div class="text-green-900 font-bold">6971/7000</div>
         </div>
  
