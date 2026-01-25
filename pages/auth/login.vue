@@ -1,24 +1,21 @@
 <template>
-  <v-row justify="center" align="center" id="auth">
+  <v-row class="bg-slate-200" justify="center" align="center" id="auth">
     <v-col cols="12" sm="6" md="3">
-      <v-card>
+      <v-card class="!bg-slate-300 mx-2">
         <v-form v-model="formValid" @submit.prevent="handleLogin">
           <v-card-text>
             <v-text-field
               class="mb-2"
-              label="Username"
+              label="Email"
               v-model="username"
-              :rules="[required]"
-              prepend-icon="mdi-account"
+     
               variant="underlined"
             />
 
             <v-text-field
               class="mb-2"
               label="Password"
-              v-model="password"
-              :rules="[required]"
-              prepend-icon="mdi-lock"
+               v-model="password"
               type="password"
               variant="underlined"
             />
@@ -28,12 +25,12 @@
             <v-spacer />
             <v-btn
               color="primary"
-              variant="tonal"
+          
               type="submit"
               :loading="loading"
     
             >
-              Login
+              Sign In
             </v-btn>
           </v-card-actions>
 
@@ -68,40 +65,30 @@ function required(v: any) {
 /* ================= LOGIN ================= */
 async function  handleLogin() {
   loading.value = true;
-
+  console.log(username.value , password.value)
+if(username.value == "mdrohulmia2025@gmail.com" && password.value == "123456"){
    try {
-   const res = await fetch("https://api.bajiraj.cloud/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "*/*",
-      },
-      body: JSON.stringify({ identifier: username.value, password: password.value }),
-    });
-
-    const data = await res.json();
-    if(data.user.role !== "admin" && data.user.role !== "agent"){
-      toast.error("You do not have permission to access this panel");
-      loading.value = false;
-      return;
-    }
-    console.log(data);
+    
+console.log("okk")
       localStorage.setItem(
         "auth_user",
         JSON.stringify({
-           username: data.user.name,
-           role: data.user.role,
-           wallet:data.user.wallet,
-           id:data.user.id,
+           username: "mdrohulmia2025@gmail.com",
            loggedIn: true,
         })
       );
           toast.success("Successfully logged in");
       navigateTo("/");
+        loading.value = false;
   } catch (err) {
     console.error('login',err);
     loading.value = false;
   }
+}
+else{
+  loading.value = false;
+}
+
 
   // setTimeout(() => {
   // {

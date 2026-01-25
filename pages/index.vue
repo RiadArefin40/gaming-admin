@@ -1,428 +1,65 @@
 <template>
-  <div class="dashboard p-4">
+  <div class="dashboard p-4 ">
 
     <!-- HEADER -->
 <!-- HEADER -->
 <header class="mb-4 compact flex gap-4 flex-col md:flex-row">
-  <!-- BALANCE CARD (for non-admins) -->
-  <div v-if="currentUserRole !== 'admin'" class="mb-4">
-    <v-card class="pa-4 rounded-xl elevation-3 flex items-center justify-between max-w-[300px]">
-      <div>
-         <v-icon color="green" size="32">mdi-wallet</v-icon>
-        <span class="text-gray-500 text-xl ml-2 pt-2">Agent Balance</span>
-             
-        <h2 class="text-2xl font-bold">৳{{ mybal || 0.00 }}</h2>
-      </div>
 
-    </v-card>
-  </div>
 
-  <!-- DATE FILTER -->
-  <div class="date-filter-pill compact flex items-center gap-2 h-10">
-    <div class="pill-input">
-      <i class="mdi mdi-calendar-start"></i>
-      <input type="date" v-model="filterStart" />
-    </div>
-
-    <span class="pill-separator">→</span>
-
-    <div class="pill-input">
-      <i class="mdi mdi-calendar-end"></i>
-      <input type="date" v-model="filterEnd" />
-    </div>
-
-    <button class="pill-btn apply" @click="applyFilter">
-      <i class="mdi mdi-filter"></i>
-    </button>
-
-    <button class="pill-btn clear" @click="clearFilter">
-      <i class="mdi mdi-close"></i>
-    </button>
-  </div>
 </header>
 
-
-<div class="flex flex-col md:flex-row gap-6">
+     <div  class=" px-2 ">
+          <p class="text-xl">Exp: 17/6/2026</p>
+        </div>
+<div class="flex flex-col my-8 gap-6">
 
       <!-- STATS -->
-    <div class="stats-grid flex-1">
-      <template v-if="loading">
-        <div v-for="i in 4" :key="i" class="stat-card skeleton"></div>
-      </template>
-      <template v-else>
-        <div v-for="card in stats" :key="card.label" class="stat-card" :class="card.color">
-          <div class="stat-title">{{ card.label }}</div>
-          <div class="stat-value">{{ card.value.toLocaleString() }}</div>
+    <div class="">
+
+
+        <div  class="bg-slate-200 px-8 py-2" >
+          <div class="text-2xl">Active Package</div>
+          <div class="">PT-4 (3000)</div>
         </div>
-      </template>
+   
+ 
     </div>
+ 
 
-    <!-- SUMMARY -->
-    <div class="summary-grid flex-1">
-      <template v-if="loading">
-        <div v-for="i in 3" :key="i" class="summary-card skeleton"></div>
-      </template>
-      <template v-else>
-     <div v-for="item in summary" :key="item.label" class="summary-card">
-  <div class="summary-title">{{ item.label }}</div>
 
-  <div
-    class="summary-value"
-    :class="item.value >= 0 ? 'text-green' : 'text-red'"
-    :style="item.label === 'Withdrawable' ? {
-      display: 'inline-block',
-      padding: '6px 14px',
-      borderRadius: '999px',
-      background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-      boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06), 0 6px 14px rgba(0,0,0,0.35)'
-    } : {}"
-  >
-    {{ item.value.toLocaleString() }}
-  </div>
-</div>
-
-      </template>
-    </div>
 
 </div>
 
+<div class="flex   gap-6">
+
+            <!-- STATS -->
+    <div class="">
 
 
-    <!-- RECENT TRANSACTIONS -->
-    <div class="transactions-card">
-
-      <!-- TAB TOGGLE -->
-      <div class="tab-toggle">
-        <button :class="{ active: transactionTab === 'All' }" @click="transactionTab = 'All'">All</button>
-        <button :class="{ active: transactionTab === 'Deposit' }" @click="transactionTab = 'Deposit'">Deposit</button>
-        <button :class="{ active: transactionTab === 'Withdraw' }" @click="transactionTab = 'Withdraw'">Withdraw</button>
-      </div>
-
-
-      <v-data-table
-  :headers="headers"
-  :items="displayedTransactions"
-   dense
->
-  <!-- Date -->
-  <template #item.created_at="{ item }">
-    {{ formatDate(item.created_at) }}
-  </template>
-
-  <!-- User -->
-  <template #item.user_id="{ item }">
-    #{{ item.user_id }}
-  </template>
-  <template #item.actions="{ item }">
-  <v-btn small color="primary" @click="fetchDepositActions(item.id)">
-    Details
-  </v-btn>
-</template>
-
-
-  <!-- Amount -->
-  <template #item.amount="{ item }">
-    <span :class="item.type === 'Deposit' ? 'text-green' : 'text-red'">
-      {{ item.amount }}
-    </span>
-  </template>
-
-  <!-- Status -->
-  <template #item.status="{ item }">
-    <span
-      :class="{
-        'status-ok': item.status === 'approved',
-        'status-warn': item.status === 'processing',
-        'status-bad': item.status === 'failed' || item.status === 'rejected'
-      }"
-    >
-      {{ item.status }}
-    </span>
-  </template>
-
-  <!-- Empty state -->
-  <template #no-data>
-    <div class="text-center text-grey py-4">
-      No transactions found
+        <div  class="bg-slate-200 p-2" >
+          <div class="text-2xl">Whatsapp</div>
+          <div class="text-green-900 font-bold">6971/7000</div>
+        </div>
+ 
     </div>
-  </template>
-</v-data-table>
-<v-dialog v-model="dialogActionHistory" max-width="600">
-  <v-card class="pa-6 rounded-2xl elevation-5">
-    <v-card-title>Deposit Action History</v-card-title>
-    <v-divider />
-    <v-table dense>
-      <thead>
-        <tr>
-          <th>Action</th>
-          <th>By</th>
-          <th>Amount</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="a in actionHistory" :key="a.id">
-          <!-- <td>{{ a.action_type }}</td> -->
-          <td>    <span
-      :class="{
-        'status-ok': a.action_type === 'approved',
-        'status-warn': a.action_type === 'processing',
-        'status-bad': a.action_type === 'failed' || a.action_type === 'rejected'
-      }"
-    >
-      {{ a.action_type }}
-    </span></td>
-          <td> <span class="text-lg font-bold">{{ a.action_by }}</span></td>
-          <td>৳{{ a.action_amount }}</td>
-          <td>{{ new Date(a.created_at).toLocaleString() }}</td>
-        </tr>
-        <tr v-if="actionHistory.length === 0">
-          <td colspan="4" class="text-center text-grey">No action history</td>
-        </tr>
-      </tbody>
-    </v-table>
-  </v-card>
-</v-dialog>
+        <div class="">
 
 
-      <!-- <table v-else class="transactions-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>User</th>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="t in displayedTransactions" :key="t.id">
-            <td>{{ formatDate(t.created_at) }}</td>
-            <td>#{{ t.user_id }}</td>
-            <td>{{ t.type }}</td>
-            <td :class="t.type === 'Deposit' ? 'text-green' : 'text-red'">{{ t.amount }}</td>
-            <td>
-              <span :class="{
-                'status-ok': t.status === 'approved',
-                'status-warn': t.status === 'processing',
-                'status-bad': t.status === 'failed' || t.status === 'rejected'
-              }">{{ t.status }}</span>
-            </td>
-          </tr>
-          <tr v-if="displayedTransactions.length === 0">
-            <td colspan="5" class="text-center text-grey">No transactions found</td>
-          </tr>
-        </tbody>
-      </table> -->
+        <div  class="bg-slate-200 p-2" >
+          <div class="text-2xl">ORT SMS</div>
+          <div class="text-red-700 font-bold">7000/0</div>
+        </div>
+ 
     </div>
+</div>
+
+
+
 
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from "vue"
 
-// ---------- DATA ----------
-const deposits = ref([])
-const withdrawals = ref([])
-const loading = ref(true)
-
-// Date filter
-const filterStart = ref('')
-const filterEnd = ref('')
-
-const headers = [
-    { title: "User", value: "user_name" },
-  { title: "Date", value: "created_at" },
-
-  { title: "Type", value: "type" },
-  { title: "Amount", value: "amount" },
-    { title: "Bonus", value: "bonus_amount" },
-  { title: "Status", value: "status" },
-    { title: "Triggered By", value: "actions", sortable: false }
-];
-
-
-// Transaction tab: All / Deposit / Withdraw
-const transactionTab = ref('All')
-const user = process.client
-  ? JSON.parse(localStorage.getItem("auth_user"))
-  : null;
-const currentUserRole = user?.role || (user ? user.role : null);
-const dialogActionHistory = ref(false);
-const actionHistory = ref([]);
-console.log('userrrrr', user)
-// ---------- FETCH ----------
-const fetchData = async () => {
-  loading.value = true
-  try {
-    const [depRes, witRes] = await Promise.all([
-      fetch("https://api.bajiraj.cloud/deposit"),
-      fetch("https://api.bajiraj.cloud/withdrawals")
-    ])
-    const dep = await depRes.json()
-    const wit = await witRes.json()
-
-    deposits.value = dep || []
-    withdrawals.value = wit || []
-    console.log(deposits.value, withdrawals.value)
-  } catch (err) {
-    console.error(err)
-  } finally {
-    loading.value = false
-    applyFilter()
-  }
-}
-
-async function fetchDepositActions(depositId) {
-  try {
-    const res = await fetch(`https://api.bajiraj.cloud/deposit/${depositId}/actions`);
-    actionHistory.value = await res.json();
-    dialogActionHistory.value = true;
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-onMounted(fetchData)
-
-// ---------- HELPERS ----------
-const formatDate = date => new Date(date).toLocaleString()
-const isToday = date => new Date(date).toDateString() === new Date().toDateString()
-const isThisWeek = date => new Date() - new Date(date) < 7 * 86400000
-const isThisMonth = date => {
-  const d = new Date(date)
-  const now = new Date()
-  return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-}
-
-// ---------- FILTERED DATA ----------
-const filteredDeposits = ref([])
-const filteredWithdrawals = ref([])
-const filteredTransactions = ref([])
-
-// Apply date filter
-const applyFilter = () => {
-  const start = filterStart.value ? new Date(filterStart.value) : new Date('1970-01-01')
-  const end = filterEnd.value ? new Date(filterEnd.value) : new Date()
-
-  filteredDeposits.value = deposits.value.filter(d => {
-    const date = new Date(d.created_at)
-    return date >= start && date <= end
-  })
-
-  filteredWithdrawals.value = withdrawals.value.filter(w => {
-    const date = new Date(w.created_at)
-    return date >= start && date <= end
-  })
-
-  filteredTransactions.value = [
-    ...filteredDeposits.value.map(d => ({ ...d, type: "Deposit" })),
-    ...filteredWithdrawals.value.map(w => ({ ...w, type: "Withdraw" }))
-  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-}
-
-// Clear filter
-const clearFilter = () => {
-  filterStart.value = ''
-  filterEnd.value = ''
-  applyFilter()
-}
-
-// ---------- STATS ----------
-const stats = computed(() => {
-  const totalDep = filteredDeposits.value
-    .filter(d => d.status === "approved")
-    .reduce(
-      (sum, d) => sum + Number(d.amount) - Number(d.bonus_amount || 0),
-      0
-    );
-
-
-
-  const totalDepBonus = filteredDeposits.value.reduce((a, b) => a + +b?.bonus_amount, 0)
-  
-  const totalWit = filteredWithdrawals.value.filter(w => w.status === "approved").reduce((a, b) => a + +b.amount, 0)
-  const netProfit = totalDep - totalWit
-  const withdrawableBalance = computed(() => {
-  const approvedDeposit = filteredDeposits.value
-    .filter(d => d.status === "approved")
-    .reduce(
-      (sum, d) => sum + Number(d.amount) - Number(d.bonus_amount || 0),
-      0
-    );
-
-  const approvedWithdraw = filteredWithdrawals.value
-    .filter(w => w.status === "approved")
-    .reduce((sum, w) => sum + Number(w.amount), 0);
-
-  return approvedDeposit - approvedWithdraw;
-
-});
-
-
-  return [
-    { label: "Total Deposit", value: totalDep, color: "green" },
-     { label: "Total Bonus", value: totalDepBonus, color: "red" },
-    { label: "Total Withdraw", value: totalWit, color: "red" },
-      {
-    label: "Est Balance",
-    value: withdrawableBalance.value,
-    color: "red"
-  },
-    { label: "Net Profit", value: netProfit, color: netProfit >= 0 ? "green" : "red" },
-    { label: "Total Payment", value: filteredDeposits.value.length + filteredWithdrawals.value.length, color: "purple" }
-  ]
-})
-
-const calcProfit = (filterFn) =>
-  deposits.value.filter(d => filterFn(d.created_at)).filter(w => w.status === "approved").reduce((a, b) => a + +Number(b.amount) - Number(b.bonus_amount || 0), 0) -
-  withdrawals.value.filter(w => filterFn(w.created_at)).filter(w => w.status === "approved").reduce((a, b) => a + +b.amount, 0)
-
-const summary = computed(() => [
-  { label: "Today", value: calcProfit(isToday) },
-  { label: "This Week", value: calcProfit(isThisWeek) },
-  { label: "This Month", value: calcProfit(isThisMonth) }
-])
-
-// ---------- TAB FILTER ----------
-const displayedTransactions = computed(() => {
-  if (transactionTab.value === 'All') return filteredTransactions.value
-  return filteredTransactions.value.filter(t => t.type === transactionTab.value)
-})
-
-const mybal = ref(0)
-
-const fetchWithdrawNotifications = async () => {
-  const userId = user?.id;
-  console.log('userid', userId)
-  if (userId){
-      try {
-    const { data, error } = await useFetch(`https://api.bajiraj.cloud/users/${userId}/balance`, {
-      method: "GET",
-    });
-   console.log('balance', data)
-    if (!error.value && data.value) {
-      mybal.value = data.value.balance;
-
-    }
-  } catch (err) {
-    console.error("Failed to fetch withdrawal notifications:", err);
-  }
-  console.log('user', user)
-
-  }
-
-};
-
-onMounted(() => {
-  fetchWithdrawNotifications();
-
-  setInterval(() => {
-    fetchWithdrawNotifications();
-  }, 10000); // auto-refresh every 15s
-});
-</script>
 
 <style>
 .dashboard-header {

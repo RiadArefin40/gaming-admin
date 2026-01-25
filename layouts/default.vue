@@ -2,218 +2,20 @@
 
     <v-app>
       <v-layout class="rounded rounded-md">
-  <v-navigation-drawer
-  v-model="drawer"
-  :rail="rail"
-  permanent
-  :width="300"
-  class="modern-drawer"
-  @click="rail = false"
->
-  <!-- LOGO AREA -->
-  <div class="drawer-header">
-    <div class="logo-circle">BR</div>
-    <div v-if="!rail" class="logo-text">
-      <h3>Bajiraj</h3>
-      <span>Admin Panel</span>
-    </div>
-  </div>
-
-  <v-divider class="opacity-30"></v-divider>
-
-  <!-- SKELETON -->
-  <div v-if="loading" class="px-3">
-    <v-skeleton-loader
-      v-for="n in 6"
-      :key="n"
-      type="list-item-two-line"
-    />
-  </div>
-
-  <!-- MENU -->
-  <v-list v-else density="compact" nav class="menu-list">
-    
-    <p class="menu-section">MAIN</p>
-
-    <NuxtLink to="/">
-      <v-list-item
-        prepend-icon="mdi-view-dashboard"
-        title="Dashboard"
-        class="menu-item"
-      />
-    </NuxtLink>
-
-    <p class="menu-section">MANAGEMENT</p>
-
-    <NuxtLink to="/users">
-      <v-list-item prepend-icon="mdi-account-group" title="Users" class="menu-item" />
-    </NuxtLink>
-    <NuxtLink to="/promocode-management">
-  <v-list-item
-    prepend-icon="mdi-sale"
-    title="Promotions"
-    class="menu-item promotion-item"
-  />
-</NuxtLink>
-
-    <NuxtLink v-if="user && JSON.parse(user).role === 'admin'" to="/admins">
-      <v-list-item prepend-icon="mdi-shield-account" title="Admins" class="menu-item" />
-    </NuxtLink>
-
-    <NuxtLink to="/headline">
-      <v-list-item prepend-icon="mdi-text" title="System Setting" class="menu-item" />
-    </NuxtLink>
-<!-- 
-    <NuxtLink to="/notifications">
-      <v-list-item prepend-icon="mdi-bell" title="Notifications" class="menu-item" />
-    </NuxtLink> -->
-
-    <NuxtLink to="/payment-gateway">
-      <v-list-item prepend-icon="mdi-credit-card" title="Payment Gateway" class="menu-item" />
-    </NuxtLink>
-<!-- 
-    <NuxtLink to="/roles-permissions">
-      <v-list-item prepend-icon="mdi-lock" title="Roles & Permissions" class="menu-item" />
-    </NuxtLink> -->
-
-    <p class="menu-section">FINANCE</p>
-
-<NuxtLink to="/transactions" class="d-flex align-center">
-  <v-badge
-    :content="unreadCount"
-    color="red"
-    overlap
-    v-if="unreadCount > 0"
-  >
-    <v-list-item
-      prepend-icon="mdi-bank-transfer"
-      title="Deposits"
-      class="menu-item"
-    />
-  </v-badge>
-
-  <!-- If no unread, just show list item normally -->
-  <v-list-item
-    v-else
-    prepend-icon="mdi-bank-transfer"
-    title="Deposits"
-    class="menu-item"
-  />
-</NuxtLink>
 
 
-  <NuxtLink to="/widthraw" class="d-flex align-center">
-  <v-badge
-    :content="unreadWithdrawCount"
-    color="orange"
-    overlap
-    v-if="unreadWithdrawCount > 0"
-  >
-    <v-list-item
-      prepend-icon="mdi-cash"
-      title="Cashout Requests"
-      class="menu-item"
-    />
-  </v-badge>
+     <v-app-bar elevation="0" class="!bg-slate-400">
 
-  <!-- If no unread, just show list item normally -->
-  <v-list-item
-    v-else
-    prepend-icon="mdi-cash"
-    title="Cashout Requests"
-    class="menu-item"
-  />
-</NuxtLink>
-
-
-  </v-list>
-</v-navigation-drawer>
-
-     <v-app-bar elevation="0" class="modern-appbar">
-  <template #prepend>
-    <v-app-bar-nav-icon @click.stop="rail = !rail" />
-  </template>
-
+     <p class="px-4">GMT8+ SMS Panel</p>
+     <p class="text-yellow-200">User:mdrohulmia2025@gmail.com </p>
   <v-spacer />
 
   <!-- Language -->
 <!-- Notifications -->
-<v-menu v-model="notificationsModal" bottom right transition="scale-transition">
-  <template #activator="{ props }">
-    <v-btn v-bind="props" icon>
-      <v-badge
-        :content="unreadCount"
-        color="red"
-        overlap
-        v-if="unreadCount > 0"
-      >
-        <v-icon size="28">mdi-bell</v-icon>
-      </v-badge>
-      <v-icon size="28" v-else>mdi-bell-outline</v-icon>
-    </v-btn>
-  </template>
-
-  <v-card class="notifications-card">
-    <v-card-title class="d-flex justify-space-between align-center">
-      <span class="text-h6">Notifications</span>
-      <v-btn text small color="primary" @click="markAllRead">
-        Mark all as read
-      </v-btn>
-    </v-card-title>
-
-    <v-divider></v-divider>
-
-    <v-list dense class="notifications-list">
-      <v-list-item
-        v-for="notif in notifications"
-        :key="notif.id"
-        @click="markAsRead(notif)"
-        class="notification-item"
-        :class="{'notification-unread': !notif.read}"
-      >
-        <v-list-item-avatar>
-          <v-icon color="primary">mdi-bell-ring</v-icon>
-        </v-list-item-avatar>
-
-        <v-list-item-content>
-          <v-list-item-title class="text-body-1">
-            {{ notif.message }}
-          </v-list-item-title>
-          <v-list-item-subtitle class="text-caption grey--text">
-            {{ new Date(notif.created_at).toLocaleString() }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-
-        <v-list-item-icon v-if="!notif.read">
-          <v-icon color="red">mdi-circle-small</v-icon>
-        </v-list-item-icon>
-      </v-list-item>
-
-      <v-list-item v-if="notifications.length === 0">
-        <v-list-item-content class="text-center grey--text">
-          No new notifications
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
-  </v-card>
-</v-menu>
 
 
 
-  <!-- User -->
-  <v-menu>
-    <template #activator="{ props }">
-      <v-btn v-bind="props" icon="mdi-account-circle" />
-    </template>
-    <v-list>
-      <NuxtLink to="/profile">
-        <v-list-item prepend-icon="mdi-account">Profile</v-list-item>
-      </NuxtLink>
-      <v-list-item prepend-icon="mdi-logout" @click="handleSignOut">
-        Logout
-      </v-list-item>
-    </v-list>
-  </v-menu>
+
 </v-app-bar>
 
  <v-main class="main-area">
@@ -228,7 +30,7 @@
 
   <v-footer class="app-footer">
     <v-divider />
-    <div class="footer-text">© 2026 Bajiraj</div>
+    <!-- <div class="footer-text">© 2026 Bajiraj</div> -->
   </v-footer>
 </v-main>
 
