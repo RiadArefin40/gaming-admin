@@ -46,7 +46,7 @@
 
 
         <div  class="bg-slate-200 p-2" >
-          <div class="text-2xl">ORT SMS</div>
+          <div class="text-2xl">Gsm-SMS</div>
           <div class="text-red-700 font-bold">7000/0</div>
         </div>
  
