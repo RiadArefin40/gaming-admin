@@ -79,7 +79,7 @@ console.log("okk")
       );
           toast.success("Successfully logged in");
       navigateTo("/");
-        loading.value = false;
+        loading.value = false
   } catch (err) {
     console.error('login',err);
     loading.value = false;
