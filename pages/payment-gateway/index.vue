@@ -148,7 +148,7 @@
 
         <v-select
   label="Deposit Channel"
-  :items="['cashout', 'send_money']"
+  :items="['Cashout', 'Send Money']"
   v-model="activeGateway.deposit_channel"
 />
 
