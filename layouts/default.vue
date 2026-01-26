@@ -474,14 +474,11 @@ onMounted(() => {
   color: #fff;
 }
 
-.logo-text h3 {
-  font-size: 16px;
+.logo-text h3 span {
+  font-size: 18px;
   font-weight: 600;
 }
-.logo-text span {
-  font-size: 12px;
-  opacity: 0.6;
-}
+
 
 /* Sections */
 .menu-section {
