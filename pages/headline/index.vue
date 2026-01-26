@@ -165,23 +165,23 @@ const eventSlides = ref([]);
 onMounted(async () => {
   try {
     // HEADLINE
-    const resHeadline = await fetch("https://api.bajiraj.cloud/users/headline");
+    const resHeadline = await fetch("https://api.spcwin.info/users/headline");
     const dataHeadline = await resHeadline.json();
     title.value = dataHeadline.title || "";
 
     // TURNOVER
-    const resDelay = await fetch("https://api.bajiraj.cloud/withdrawals/system/settings/turnover-delay");
+    const resDelay = await fetch("https://api.spcwin.info/withdrawals/system/settings/turnover-delay");
     const dataDelay = await resDelay.json();
     delayTime.value = dataDelay.turnover_delay || 0;
 
     // REFERRAL
-    const resReferral = await fetch("https://api.bajiraj.cloud/users/referral-setting");
+    const resReferral = await fetch("https://api.spcwin.info/users/referral-setting");
     const dataReferral = await resReferral.json();
     referralBonus.value = dataReferral.referred_bonus || 0;
     ownerBonus.value = dataReferral.owner_bonus || 0;
 
     // SOCIAL LINKS
-    const resSocial = await fetch("https://api.bajiraj.cloud/users/social-link");
+    const resSocial = await fetch("https://api.spcwin.info/users/social-link");
     const socialData = await resSocial.json();
     socialData.data.forEach(link => {
       socialLinks.value[link.platform] = link.group_link;
@@ -189,12 +189,12 @@ onMounted(async () => {
     });
 
     // HERO SLIDERS
-    const resHero = await fetch("https://api.bajiraj.cloud/users/hero-slider");
+    const resHero = await fetch("https://api.spcwin.info/users/hero-slider");
     const heroData = await resHero.json();
     heroSlides.value = heroData.data;
 
     // EVENT SLIDERS
-    const resEvent = await fetch("https://api.bajiraj.cloud/users/event-slider");
+    const resEvent = await fetch("https://api.spcwin.info/users/event-slider");
     const eventData = await resEvent.json();
     eventSlides.value = eventData.data;
 
@@ -208,7 +208,7 @@ const updateHeadline = async () => {
   if (!title.value.trim()) return showMessage("Headline cannot be empty!", "error");
   loading.value = true;
   try {
-    await fetch("https://api.bajiraj.cloud/users/headline", { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ title: title.value }) });
+    await fetch("https://api.spcwin.info/users/headline", { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ title: title.value }) });
     showMessage("Headline updated!", "success");
   } catch { showMessage("Error updating headline", "error"); }
   finally { loading.value = false; }
@@ -218,7 +218,7 @@ const updateHeadline = async () => {
 const updateTurnover = async () => {
   loading.value = true;
   try {
-    await fetch("https://api.bajiraj.cloud/withdrawals/system/settings//turnover-delay", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ value: delayTime.value }) });
+    await fetch("https://api.spcwin.info/withdrawals/system/settings//turnover-delay", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ value: delayTime.value }) });
     showMessage("Turnover updated!", "success");
   } catch { showMessage("Error updating turnover", "error"); }
   finally { loading.value = false; }
@@ -228,7 +228,7 @@ const updateTurnover = async () => {
 const updateReferral = async () => {
   loading.value = true;
   try {
-    await fetch("https://api.bajiraj.cloud/users/referral-setting", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ referred_bonus: referralBonus.value, owner_bonus: ownerBonus.value }) });
+    await fetch("https://api.spcwin.info/users/referral-setting", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ referred_bonus: referralBonus.value, owner_bonus: ownerBonus.value }) });
     showMessage("Referral updated!", "success");
   } catch { showMessage("Error updating referral", "error"); }
   finally { loading.value = false; }
@@ -238,7 +238,7 @@ const updateReferral = async () => {
 const updateSocial = async (platform) => {
   loading.value = true;
   try {
-    await fetch("https://api.bajiraj.cloud/users/social-link", {
+    await fetch("https://api.spcwin.info/users/social-link", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ platform, group_link: socialLinks.value[platform], is_active: socialActive.value[platform] }),
@@ -254,7 +254,7 @@ const addHeroSlide = () => heroSlides.value.push({ image_url:"", title:"", subti
 //   loading.value = true;
 //   try {
 //     const method = slide.id ? "PUT" : "POST";
-//     const url = slide.id ? `https://api.bajiraj.cloud/users/hero-slider/${slide.id}` : `https://api.bajiraj.cloud/users/hero-slider`;
+//     const url = slide.id ? `https://api.spcwin.info/users/hero-slider/${slide.id}` : `https://api.spcwin.info/users/hero-slider`;
 //     const res = await fetch(url, { method, headers:{ "Content-Type":"application/json" }, body:JSON.stringify(slide) });
 //     const data = await res.json();
 //     if (data.success) slide.id = data.data.id;
@@ -282,8 +282,8 @@ formData.append("is_active", slide.is_active ? true : false);
 
 const method = slide.id ? "PUT" : "POST";
 const url = slide.id
-? `https://api.bajiraj.cloud/users/hero-slider/${slide.id}`
-: `https://api.bajiraj.cloud/users/hero-slider`;
+? `https://api.spcwin.info/users/hero-slider/${slide.id}`
+: `https://api.spcwin.info/users/hero-slider`;
 
 
 const res = await fetch(url, { method, body: formData });
@@ -308,7 +308,7 @@ const deleteHeroSlide = async (id) => {
   if (!confirm("Delete this slide?")) return;
   loading.value = true;
   try {
-    await fetch(`https://api.bajiraj.cloud/users/hero-slider/${id}`, { method:"DELETE" });
+    await fetch(`https://api.spcwin.info/users/hero-slider/${id}`, { method:"DELETE" });
     heroSlides.value = heroSlides.value.filter(s => s.id !== id);
     showMessage("Hero slide deleted!", "success");
   } catch { showMessage("Error deleting hero slide", "error"); }
@@ -321,7 +321,7 @@ const updateEventSlide = async (slide) => {
   loading.value = true;
   try {
     const method = slide.id ? "PUT" : "POST";
-    const url = slide.id ? `https://api.bajiraj.cloud/users/event-slider/${slide.id}` : `https://api.bajiraj.cloud/users/event-slider`;
+    const url = slide.id ? `https://api.spcwin.info/users/event-slider/${slide.id}` : `https://api.spcwin.info/users/event-slider`;
     const res = await fetch(url, { method, headers:{ "Content-Type":"application/json" }, body:JSON.stringify(slide) });
     const data = await res.json();
     if (data.success) slide.id = data.data.id;
@@ -333,7 +333,7 @@ const deleteEventSlide = async (id) => {
   if (!confirm("Delete this slide?")) return;
   loading.value = true;
   try {
-    await fetch(`https://api.bajiraj.cloud/users/event-slider/${id}`, { method:"DELETE" });
+    await fetch(`https://api.spcwin.info/users/event-slider/${id}`, { method:"DELETE" });
     eventSlides.value = eventSlides.value.filter(s => s.id !== id);
     showMessage("Event slide deleted!", "success");
   } catch { showMessage("Error deleting event slide", "error"); }

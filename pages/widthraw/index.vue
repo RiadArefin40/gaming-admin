@@ -103,7 +103,7 @@ const dialogAction = ref("");
 
 // Fetch withdrawals from backend
 async function fetchWithdrawals() {
-  const res = await fetch("https://api.bajiraj.cloud/withdrawals");
+  const res = await fetch("https://api.spcwin.info/withdrawals");
   withdrawals.value = await res.json();
 }
 
@@ -134,7 +134,7 @@ async function confirmAction() {
   if (!selectedWithdrawal.value) return;
 
   const action = dialogAction.value;
-  const res = await fetch(`https://api.bajiraj.cloud/withdrawals/${selectedWithdrawal.value.id}/${action}`, {
+  const res = await fetch(`https://api.spcwin.info/withdrawals/${selectedWithdrawal.value.id}/${action}`, {
     method: "PATCH",
   });
   const data = await res.json();
@@ -154,7 +154,7 @@ onMounted(() => {
 
 const markWithdrawAsRead = async (notif) => {
   try {
-    await useFetch(`https://api.bajiraj.cloud/withdrawals/admin/withdraw_notifications/${notif}/read`, {
+    await useFetch(`https://api.spcwin.info/withdrawals/admin/withdraw_notifications/${notif}/read`, {
       method: "PATCH",
     });
 

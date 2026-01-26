@@ -367,7 +367,7 @@ const betTypes = ref(["All", "slot", "live", "sport"]); // Adjust according to y
 async function fetchBettings(userId) {  
   loadingBettings.value = true;
   try {
-    const res = await fetch(`https://api.bajiraj.cloud/users/userbet/${userId}`);
+    const res = await fetch(`https://api.spcwin.info/users/userbet/${userId}`);
     bettings.value = await res.json();
     dialogBetting.value = true;
   } catch (err) {
@@ -408,7 +408,7 @@ const filteredUsers = computed(() => {
 async function fetchUsers() {
   loadingUsers.value = true;
   try {
-    const res = await fetch("https://api.bajiraj.cloud/users");
+    const res = await fetch("https://api.spcwin.info/users");
         const data = await res.json();
    roles.value = data.filter(
   user => user.role !== "admin" && user.role !== "agent"
@@ -425,7 +425,7 @@ async function fetchUsers() {
 async function createUser() {
   loadingAction.value = true;
   try {
-    const res = await fetch("https://api.bajiraj.cloud/users", {
+    const res = await fetch("https://api.spcwin.info/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(createForm.value),
@@ -457,7 +457,7 @@ async function updateUser() {
 
   try {
     const res = await fetch(
-      `https://api.bajiraj.cloud/users/${activeUser.value.id}`,
+      `https://api.spcwin.info/users/${activeUser.value.id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -487,7 +487,7 @@ async function deleteUser() {
   loadingAction.value = true;
 
   try {
-    await fetch(`https://api.bajiraj.cloud/users/${activeUser.value.id}`, {
+    await fetch(`https://api.spcwin.info/users/${activeUser.value.id}`, {
       method: "DELETE",
     });
 
@@ -510,7 +510,7 @@ async function deleteUser() {
 async function toggleUserStatus(user) {
   try {
     const res = await fetch(
-      `https://api.bajiraj.cloud/users/${user.id}/toggle-status`,
+      `https://api.spcwin.info/users/${user.id}/toggle-status`,
       { method: "PATCH" }
     );
 
@@ -534,7 +534,7 @@ async function toggleUserStatus(user) {
 // async function fetchTransactions(userId) {
 //   loadingTransactions.value = true;
 //   try {
-//     const res = await fetch(`https://api.bajiraj.cloud/users/${userId}/transactions`);
+//     const res = await fetch(`https://api.spcwin.info/users/${userId}/transactions`);
 //     transactions.value = await res.json();
 //     dialogTransaction.value = true;
 //   } catch {
@@ -577,8 +577,8 @@ async function fetchTransactions(userId) {
 
   try {
     const [depositRes, withdrawRes] = await Promise.all([
-      fetch(`https://api.bajiraj.cloud/deposit/${userId}`),
-      fetch(`https://api.bajiraj.cloud/withdrawals/${userId}`)
+      fetch(`https://api.spcwin.info/deposit/${userId}`),
+      fetch(`https://api.spcwin.info/withdrawals/${userId}`)
     ])
     const depositData = await depositRes.json()
     const withdrawData = await withdrawRes.json()

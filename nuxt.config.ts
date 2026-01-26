@@ -1,4 +1,4 @@
-// https://nuxt.com/docshttps://api.bajiraj.cloud/configuration/nuxt-config
+// https://nuxt.com/docshttps://api.spcwin.info/configuration/nuxt-config
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 export default defineNuxtConfig({
   app:{
@@ -6,7 +6,7 @@ export default defineNuxtConfig({
       script: [
 
         {
-          src: `https://maps.googleapis.com/mapshttps://api.bajiraj.cloud/js?key=${process.env.GOOGLE_MAP_API_KEY}&callback=initGoogleMaps`,
+          src: `https://maps.googleapis.com/mapshttps://api.spcwin.info/js?key=${process.env.GOOGLE_MAP_API_KEY}&callback=initGoogleMaps`,
           async: true,
           defer: true,
         },

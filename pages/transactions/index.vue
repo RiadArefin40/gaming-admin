@@ -145,7 +145,7 @@ async function confirmAction() {
   if(user?.id){
   try {
     // 1️⃣ Call backend to approve/reject
-    const res = await fetch(`https://api.bajiraj.cloud/deposit/${depositId}/${action}`, {
+    const res = await fetch(`https://api.spcwin.info/deposit/${depositId}/${action}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -194,7 +194,7 @@ async function confirmAction() {
 async function fetchTransactions() {
   loading.value = true;
   try {
-    const res = await fetch("https://api.bajiraj.cloud/deposit"); // Replace with real endpoint
+    const res = await fetch("https://api.spcwin.info/deposit"); // Replace with real endpoint
     transactions.value = await res.json();
   } catch (err) {
     console.error("Failed to fetch transactions:", err);
@@ -206,7 +206,7 @@ async function fetchTransactions() {
 onMounted(() => fetchTransactions());
 const markAsRead = async (notif) => {
   try {
-    const { error } = await useFetch(`https://api.bajiraj.cloud/deposit/admin/notifications/${notif}/read`, {
+    const { error } = await useFetch(`https://api.spcwin.info/deposit/admin/notifications/${notif}/read`, {
       method: "PATCH",
     });
 
@@ -232,7 +232,7 @@ const withdrawModal = ref(false);
 // Fetch withdrawal notifications
 const fetchWithdrawNotifications = async () => {
   try {
-    const { data, error } = await useFetch("https://api.bajiraj.cloud/withdrawals/admin/withdraw_notifications?unread=true", {
+    const { data, error } = await useFetch("https://api.spcwin.info/withdrawals/admin/withdraw_notifications?unread=true", {
       method: "GET",
       // headers: { Authorization: `Bearer ${token}` },
     });
@@ -249,7 +249,7 @@ const fetchWithdrawNotifications = async () => {
 // Mark single notification as read
 const markWithdrawAsRead = async (notif) => {
   try {
-    await useFetch(`https://api.bajiraj.cloud/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
+    await useFetch(`https://api.spcwin.info/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
       method: "PATCH",
     });
 
@@ -264,7 +264,7 @@ const markWithdrawAsRead = async (notif) => {
 const markAllWithdrawRead = async () => {
   try {
     for (const notif of withdrawNotifications.value.filter(n => !n.read)) {
-      await useFetch(`https://api.bajiraj.cloud/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
+      await useFetch(`https://api.spcwin.info/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
         method: "PATCH",
       });
       notif.read = true;

@@ -257,8 +257,8 @@ const fetchData = async () => {
   loading.value = true
   try {
     const [depRes, witRes] = await Promise.all([
-      fetch("https://api.bajiraj.cloud/deposit"),
-      fetch("https://api.bajiraj.cloud/withdrawals")
+      fetch("https://api.spcwin.info/deposit"),
+      fetch("https://api.spcwin.info/withdrawals")
     ])
     const dep = await depRes.json()
     const wit = await witRes.json()
@@ -276,7 +276,7 @@ const fetchData = async () => {
 
 async function fetchDepositActions(depositId) {
   try {
-    const res = await fetch(`https://api.bajiraj.cloud/deposit/${depositId}/actions`);
+    const res = await fetch(`https://api.spcwin.info/deposit/${depositId}/actions`);
     actionHistory.value = await res.json();
     dialogActionHistory.value = true;
   } catch (err) {
@@ -398,7 +398,7 @@ const fetchWithdrawNotifications = async () => {
   console.log('userid', userId)
   if (userId){
       try {
-    const { data, error } = await useFetch(`https://api.bajiraj.cloud/users/${userId}/balance`, {
+    const { data, error } = await useFetch(`https://api.spcwin.info/users/${userId}/balance`, {
       method: "GET",
     });
    console.log('balance', data)
