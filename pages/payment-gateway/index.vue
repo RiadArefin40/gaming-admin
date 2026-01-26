@@ -119,7 +119,7 @@
         </v-card-text>
         <v-select
   label="Deposit Channel"
-  :items="['cashout', 'send_money']"
+  :items="['Cashout', 'Send Money']"
   v-model="gatewayForm.deposit_channel"
 />
 
