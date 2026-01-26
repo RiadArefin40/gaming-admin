@@ -12,10 +12,9 @@
 >
   <!-- LOGO AREA -->
   <div class="drawer-header">
-    <div class="logo-circle">BR</div>
+ 
     <div v-if="!rail" class="logo-text">
-      <h3 class="font-bold text-xl"> <span class="text-xl text-xl text-yellow-400">SPC</span>WIN</h3>
-      <span>Admin Panel</span>
+<img class="w-[180px] -my-[19px]" src="/public/spcwin.png" alt="">
     </div>
   </div>
 
