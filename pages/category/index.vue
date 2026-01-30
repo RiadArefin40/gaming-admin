@@ -301,7 +301,10 @@ async function fetchCategories() {
 
 async function fetchGames(categoryId) {
   const res = await fetch(`${API_BASE}/users/game-categories/${categoryId}/games`)
-  games.value = await res.json()
+
+   const gamesData = await res.json()
+    console.log("res", gamesData.games)
+    games.value = gamesData.games
 }
 
 // ---------------- CATEGORY METHODS ----------------
