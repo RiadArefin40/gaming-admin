@@ -75,10 +75,11 @@
 <div v-for="slide in heroSlides" :key="slide.id" class="slider-card">
 <!-- File Upload -->
 <input type="file" @change="onFileChange($event, slide)" />
-<img v-if="slide.preview" :src="slide.preview" alt="Preview" class="preview" />
+<v-img height="80" v-if="slide.image_url" :src="API_BASE + slide.image_url" alt="Preview" class="preview" />
+<v-img height="80" v-if="slide.preview" :src="slide.preview" alt="Preview" class="preview" />
 <input type="text" v-model="slide.title" placeholder="Title" />
-<input type="text" v-model="slide.subtitle" placeholder="Subtitle" />
-<input type="text" v-model="slide.link_url" placeholder="Link URL" />
+<!-- <input type="text" v-model="slide.subtitle" placeholder="Subtitle" />
+<input type="text" v-model="slide.link_url" placeholder="Link URL" /> -->
 
 
 <div class="slider-actions">
@@ -95,10 +96,10 @@
           <h3>Event Sliders</h3>
           <button class="add-btn" @click="addEventSlide">+ Add Slide</button>
           <div v-for="slide in eventSlides" :key="slide.id" class="slider-card">
-            <input type="text" v-model="slide.image_url" placeholder="Image URL" />
-            <input type="text" v-model="slide.title" placeholder="Title" />
-            <input type="text" v-model="slide.subtitle" placeholder="Subtitle" />
-            <input type="text" v-model="slide.link_url" placeholder="Link URL" />
+        <input type="file" @change="onFileChange($event, slide)" />
+<v-img height="80" v-if="slide.image_url" :src="API_BASE + slide.image_url" alt="Preview" class="preview" />
+<v-img height="80" v-if="slide.preview" :src="slide.preview" alt="Preview" class="preview" />
+<input type="text" v-model="slide.title" placeholder="Title" />
             <div class="slider-actions">
               <label><input type="checkbox" v-model="slide.is_active" /> Active</label>
               <input type="number" v-model="slide.position" placeholder="Position" />
@@ -121,7 +122,7 @@
 
 <script setup>
 import { ref } from "vue";
-
+const API_BASE = 'https://api.spcwin.info' 
 const activeTab = ref("headline");
 const tabs = [
   { key: "headline", label: "Dashboard Headline" },
@@ -319,24 +320,53 @@ const deleteHeroSlide = async (id) => {
 const addEventSlide = () => eventSlides.value.push({ image_url:"", title:"", subtitle:"", link_url:"", position:0, is_active:true });
 const updateEventSlide = async (slide) => {
   loading.value = true;
-  try {
-    const method = slide.id ? "PUT" : "POST";
-    const url = slide.id ? `https://api.spcwin.info/users/event-slider/${slide.id}` : `https://api.spcwin.info/users/event-slider`;
-    const res = await fetch(url, { method, headers:{ "Content-Type":"application/json" }, body:JSON.stringify(slide) });
-    const data = await res.json();
-    if (data.success) slide.id = data.data.id;
-    showMessage("Event slide saved!", "success");
-  } catch { showMessage("Error saving event slide", "error"); }
-  finally { loading.value = false; }
+try {
+const formData = new FormData();
+
+
+if (slide.file) formData.append("image", slide.file);
+else if (slide.image_url) formData.append("image_url", slide.image_url);
+
+
+formData.append("title", slide.title || "");
+formData.append("subtitle", slide.subtitle || "");
+formData.append("link_url", slide.link_url || "");
+formData.append("position", slide.position || 0);
+formData.append("is_active", slide.is_active ? true : false);
+
+
+const method = slide.id ? "PUT" : "POST";
+const url = slide.id
+? `https://api.spcwin.info/users/event-slider/${slide.id}`
+: `https://api.spcwin.info/users/event-slider`;
+
+
+const res = await fetch(url, { method, body: formData });
+const data = await res.json();
+
+
+if (data.success) {
+slide.id = data.data.id;
+slide.image_url = data.data.image_url; // update URL after upload
+slide.file = null;
+slide.preview = null;
+showMessage("Hero slide saved!", "success");
+} else showMessage(data.message || "Error saving slide", "error");
+} catch (err) {
+console.error(err);
+showMessage("Error saving hero slide", "error");
+} finally {
+loading.value = false;
+}
 };
 const deleteEventSlide = async (id) => {
   if (!confirm("Delete this slide?")) return;
   loading.value = true;
   try {
     await fetch(`https://api.spcwin.info/users/event-slider/${id}`, { method:"DELETE" });
-    eventSlides.value = eventSlides.value.filter(s => s.id !== id);
-    showMessage("Event slide deleted!", "success");
-  } catch { showMessage("Error deleting event slide", "error"); }
+    heroSlides.value = heroSlides.value.filter(s => s.id !== id);
+    showMessage("Hero slide deleted!", "success");
+  } catch { showMessage("Error deleting hero slide", "error"); }
   finally { loading.value = false; }
 };
 
