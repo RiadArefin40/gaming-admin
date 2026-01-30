@@ -134,6 +134,7 @@
           <v-file-input label="Image" accept="image/*" v-model="categoryForm.image" outlined />
           <v-text-field label="Position" v-model.number="categoryForm.position" type="number" outlined />
           <v-switch label="Active" v-model="categoryForm.is_active" />
+          
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn variant="tonal" @click="closeCategoryDialog">Cancel</v-btn>
@@ -152,6 +153,8 @@
           <v-file-input label="Image" accept="image/*" v-model="gameForm.image" outlined />
           <v-text-field label="Position" v-model.number="gameForm.position" type="number" outlined />
           <v-switch label="Active" v-model="gameForm.is_active" />
+          <v-switch label="Provider" v-model="gameForm.is_provider" />
+
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn variant="tonal" @click="closeGameDialog">Cancel</v-btn>
@@ -183,7 +186,14 @@ const editingGame = ref(false)
 
 // ---------------- FORMS ----------------
 const categoryForm = ref({ title: '', image: null, position: 0, is_active: true })
-const gameForm = ref({ uid: '', title: '', image: null, position: 0, is_active: true })
+const gameForm = ref({
+  uid: '',
+  title: '',
+  image: null,
+  position: 0,
+  is_active: true,
+  is_provider: false, // ✅ add this
+})
 
 // ---------------- TABLE HEADERS ----------------
 const categoryHeaders = [
@@ -278,6 +288,7 @@ async function saveGame() {
   fd.append('title', gameForm.value.title)
   fd.append('position', gameForm.value.position)
   fd.append('is_active', gameForm.value.is_active)
+  fd.append('is_provider', gameForm.value.is_provider) // ✅ added
   fd.append('category_id', selectedCategory.value.id)
   if (gameForm.value.image) fd.append('image', gameForm.value.image)
 
@@ -290,6 +301,7 @@ async function saveGame() {
   closeGameDialog()
   fetchGames(selectedCategory.value.id)
 }
+
 
 // ---------------- DELETE METHODS ----------------
 async function deleteCategory(cat) {
