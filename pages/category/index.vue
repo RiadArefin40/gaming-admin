@@ -14,7 +14,7 @@
         />
       </v-col>
       <v-col class="d-flex justify-end">
-        <v-btn size="32" color="gradient-cyan" @click="dialogCreateCategory = true">
+        <v-btn  color="gradient-cyan" @click="dialogCreateCategory = true">
           New Category
         </v-btn>
       </v-col>
@@ -66,7 +66,7 @@
     <v-row v-if="selectedCategory">
       <v-col cols="12" class="d-flex justify-space-between mb-4">
         <div class="text-h6 font-bold">Games in "{{ selectedCategory.title }}"</div>
-        <v-btn size="32" color="gradient-cyan" @click="dialogCreateGame = true">Add Game</v-btn>
+        <v-btn  color="gradient-cyan" @click="dialogCreateGame = true">Add Game/Provider</v-btn>
       </v-col>
    
       <v-col cols="12" sm="6">
