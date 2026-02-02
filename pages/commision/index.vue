@@ -1,5 +1,54 @@
 <template>
   <v-container fluid class="pa-6">
+
+    <!-- -------------------- -->
+    <!-- Cron Config Panel -->
+    <!-- -------------------- -->
+    <v-card class="mb-6 rounded-xl pa-4 elevation-3">
+      <v-row align="center" justify="space-between">
+        <v-col cols="12" sm="3">
+          <v-switch
+            v-model="cronConfig.enabled"
+            label="Enable Affiliate Settlement"
+          />
+        </v-col>
+
+        <v-col cols="12" sm="3">
+          <v-select
+            v-model="cronConfig.type"
+            :items="['daily', 'weekly', 'monthly']"
+            label="Frequency"
+            dense
+          />
+        </v-col>
+
+        <v-col cols="12" sm="3" v-if="cronConfig.type === 'weekly'">
+          <v-select
+            v-model="cronConfig.day"
+            :items="daysOfWeek"
+            label="Day of week"
+            dense
+          />
+        </v-col>
+
+        <v-col cols="12" sm="3">
+          <v-text-field
+            v-model="cronConfig.time"
+            label="Time (HH:MM UTC)"
+            dense
+            placeholder="00:05"
+          />
+        </v-col>
+
+        <v-col cols="12" sm="12" class="mt-2">
+          <v-btn color="primary" @click="updateCronConfig">Update Schedule</v-btn>
+        </v-col>
+      </v-row>
+    </v-card>
+
+    <!-- -------------------- -->
+    <!-- Search + Table -->
+    <!-- -------------------- -->
     <v-row class="mb-4" align="center">
       <v-col cols="12" sm="4" md="3">
         <v-text-field
@@ -24,7 +73,6 @@
         dense
         class="modern-data-table"
       >
-        <!-- Status Chip -->
         <template #item.status="{ item }">
           <v-chip
             :color="statusColor(item.status)"
@@ -36,12 +84,10 @@
           </v-chip>
         </template>
 
-        <!-- Commission Amount -->
         <template #item.commission_amount="{ item }">
           ৳{{ item.commission_amount }}
         </template>
 
-        <!-- Action Buttons -->
         <template #item.action="{ item }">
           <v-btn
             v-if="item.status === 'pending'"
@@ -87,6 +133,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
   </v-container>
 </template>
 
@@ -99,6 +146,22 @@ const search = ref("");
 const dialogDetails = ref(false);
 const activeCommission = ref(null);
 
+const cronConfig = ref({
+  enabled: false,
+  type: 'weekly',
+  day: 1,
+  time: '00:05',
+});
+const daysOfWeek = [
+  { text: "Sunday", value: 0 },
+  { text: "Monday", value: 1 },
+  { text: "Tuesday", value: 2 },
+  { text: "Wednesday", value: 3 },
+  { text: "Thursday", value: 4 },
+  { text: "Friday", value: 5 },
+  { text: "Saturday", value: 6 },
+];
+
 const headers = [
   { title: "Referrer", value: "referrer_name" },
   { title: "Referred User", value: "referred_name" },
@@ -109,7 +172,9 @@ const headers = [
   { title: "Action", value: "action" },
 ];
 
-// fetch commissions
+// --------------------
+// Fetch commissions
+// --------------------
 async function fetchCommissions() {
   loading.value = true;
   try {
@@ -123,39 +188,66 @@ async function fetchCommissions() {
   }
 }
 
-// approve commission
+// --------------------
+// Fetch cron config
+// --------------------
+async function fetchCronConfig() {
+  try {
+    const res = await fetch("https://api.spcwin.info/users/affiliate-cron");
+    const data = await res.json();
+    cronConfig.value = { ...cronConfig.value, ...data };
+  } catch (err) {
+    console.error(err);
+    alert("Failed to fetch cron config");
+  }
+}
+
+// --------------------
+// Update cron config
+// --------------------
+async function updateCronConfig() {
+  try {
+    const res = await fetch("https://api.spcwin.info/users/affiliate-cron", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cronConfig.value),
+    });
+    const data = await res.json();
+    if (res.ok) alert("Cron config updated!");
+    else throw new Error(data.error || "Failed to update");
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+}
+
+// --------------------
+// Approve/Reject commissions
+// --------------------
 async function approveCommission(item) {
   try {
     const res = await fetch(`https://api.spcwin.info/users/affiliate/${item.id}/approve`, { method: "PATCH" });
     if (!res.ok) throw new Error("Failed to approve");
     item.status = "approved";
     alert("Commission approved!");
-  } catch (e) {
-    console.error(e);
-    alert(e.message);
-  }
+  } catch (e) { console.error(e); alert(e.message); }
 }
-
-// reject commission
 async function rejectCommission(item) {
   try {
     const res = await fetch(`https://api.spcwin.info/users/affiliate/${item.id}/reject`, { method: "PATCH" });
     if (!res.ok) throw new Error("Failed to reject");
     item.status = "rejected";
     alert("Commission rejected!");
-  } catch (e) {
-    console.error(e);
-    alert(e.message);
-  }
+  } catch (e) { console.error(e); alert(e.message); }
 }
-
-// view details
 function viewDetails(item) {
   activeCommission.value = { ...item };
   dialogDetails.value = true;
 }
 
-// filter search
+// --------------------
+// Computed / Helpers
+// --------------------
 const filteredCommissions = computed(() => {
   if (!search.value) return commissions.value;
   return commissions.value.filter(c =>
@@ -163,7 +255,6 @@ const filteredCommissions = computed(() => {
   );
 });
 
-// status color
 function statusColor(status) {
   if (status === "pending") return "orange lighten-2";
   if (status === "approved") return "green lighten-2";
@@ -171,31 +262,19 @@ function statusColor(status) {
   return "grey";
 }
 
-// format date
 function formatDate(date) {
   return date ? new Date(date).toLocaleDateString() : "";
 }
 
-onMounted(fetchCommissions);
+onMounted(() => {
+  fetchCommissions();
+  fetchCronConfig();
+});
 </script>
 
 <style scoped>
-/* reuse your Users page modern-table styles */
-.modern-data-table th {
-  font-weight: 600;
-  font-size: 12px;
-}
-.status-chip {
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 11px;
-}
-.search-input {
-  max-width: 360px;
-}
-.v-btn {
-  font-size: 12px;
-  text-transform: none;
-  margin-right: 4px;
-}
+.modern-data-table th { font-weight: 600; font-size: 12px; }
+.status-chip { font-weight: 600; text-transform: uppercase; font-size: 11px; }
+.search-input { max-width: 360px; }
+.v-btn { font-size: 12px; text-transform: none; margin-right: 4px; }
 </style>
