@@ -47,6 +47,9 @@
     <NuxtLink to="/users">
       <v-list-item prepend-icon="mdi-account-group" title="Users" class="menu-item" />
     </NuxtLink>
+            <NuxtLink to="/commision">
+      <v-list-item prepend-icon="mdi-text" title="Referral setting" class="menu-item" />
+    </NuxtLink>
         <NuxtLink to="/category">
       <v-list-item prepend-icon="mdi-text" title="Manage Categories" class="menu-item" />
     </NuxtLink>
