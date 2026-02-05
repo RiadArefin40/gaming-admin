@@ -48,7 +48,7 @@
       <v-list-item prepend-icon="mdi-account-group" title="Users" class="menu-item" />
     </NuxtLink>
                <NuxtLink to="/payment-sms">
-      <v-list-item prepend-icon="mdi-text" title="Referral setting" class="menu-item" />
+      <v-list-item prepend-icon="mdi-text" title="Payment Sms" class="menu-item" />
     </NuxtLink>
             <NuxtLink to="/commision">
       <v-list-item prepend-icon="mdi-text" title="Referral setting" class="menu-item" />
