@@ -9,7 +9,7 @@
           placeholder="Search categories..."
           prepend-inner-icon="mdi-magnify"
           variant="solo"
-          hide-details
+        
           density="comfortable"
         />
       </v-col>
@@ -74,9 +74,7 @@
           v-model="gameSearch"
           placeholder="Search Games..."
           prepend-inner-icon="mdi-magnify"
-          variant="solo"
-          hide-details
-          density="comfortable"
+
         />
       </v-col>
 
@@ -128,7 +126,7 @@
         <v-data-table
           :headers="childGameHeaders"
           :items="childGames(item.id)"
-          hide-default-footer
+       
           dense
         >
           <template #item.uid="{ item }">{{ item.uid }}</template>
