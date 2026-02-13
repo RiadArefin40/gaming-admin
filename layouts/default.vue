@@ -48,7 +48,17 @@
       <v-list-item prepend-icon="mdi-account-group" title="Users" class="menu-item" />
     </NuxtLink>
                    <NuxtLink to="/chat">
-      <v-list-item prepend-icon="mdi-text" title="Live Support" class="menu-item" />
+                      <v-badge
+    :content="unreadCounts"
+    color="red"
+    overlap
+    v-if="unreadCounts> 0"
+  >
+  <v-list-item prepend-icon="mdi-text" title="Live Support" class="menu-item" />
+  </v-badge>
+    <v-list-item v-else prepend-icon="mdi-text" title="Live Support" class="menu-item" />
+
+
     </NuxtLink>
                <NuxtLink to="/payment-sms">
       <v-list-item prepend-icon="mdi-text" title="Payment Sms" class="menu-item" />
@@ -266,14 +276,172 @@ const loading = ref(false);
 import GoogleMap from "~/components/GoogleMap.vue";
 const seeLocation = ref(false);
 const allLocations = [];
+import axios from "axios";
 const locationBtnLoading = ref(false);
+import { io } from "socket.io-client";
 
+const chats = ref([]);
 const user = process.client
   ? localStorage.getItem("auth_user")
   : null;
 
 //  const token = useAuthData?.token?.value;
 const token = '';
+
+const selectedChat = ref(null);
+const messages = ref([]);
+const input = ref("");
+const search = ref("");
+const chatEnd = ref(null);
+// store online user_ids as a Set
+
+// ---------------- SOCKET ----------------
+const socket = io("https://api.spcwin.info", {
+  transports: ["websocket"],
+  path: "/socket.io",
+});
+
+socket.on("connect", () => console.log("✅ Socket connected:", socket.id));
+socket.emit("admin_online"); // let server know admin is online
+
+// ---------------- RECEIVE TEXT ----------------
+socket.on("receive_message", (msg) => {
+  const chatIndex = chats.value.findIndex(c => c.id === msg.chat_id);
+
+  if (selectedChat.value?.id === msg.chat_id) {
+    if (!messages.value.find(m => m.id === msg.id)) {
+      messages.value.push(msg);
+      scrollToEnd();
+    }
+  } else if (chatIndex !== -1) {
+    chats.value[chatIndex] = {
+      ...chats.value[chatIndex],
+      unread_count: (chats.value[chatIndex].unread_count || 0) + 1
+    };
+  }
+});
+
+// ---------------- RECEIVE IMAGE ----------------
+socket.on("receive_image", (msg) => {
+  // msg should have { chatId, id, sender, image }
+  const chatIndex = chats.value.findIndex(c => c.id === msg.chatId);
+
+  const imageMsg = {
+    id: msg.id,
+    chat_id: msg.chatId,
+    sender: msg.sender,
+    message: msg.image,
+    type: "image",
+    created_at: new Date().toISOString(),
+  };
+
+  if (selectedChat.value?.id === msg.chatId) {
+    if (!messages.value.find(m => m.id === imageMsg.id)) {
+      messages.value.push(imageMsg);
+      scrollToEnd();
+    }
+  } else if (chatIndex !== -1) {
+    chats.value[chatIndex] = {
+      ...chats.value[chatIndex],
+      unread_count: (chats.value[chatIndex].unread_count || 0) + 1
+    };
+  }
+});
+
+// ---------------- UNREAD COUNT ----------------
+socket.on("unread_count", ({ chatId, count }) => {
+  // unreadCounts.value = count || 0;
+  const chatIndex = chats.value.findIndex(c => c.id === chatId);
+  if (chatIndex !== -1) {
+    chats.value[chatIndex] = {
+      ...chats.value[chatIndex],
+      unread_count: count
+    };
+  }
+});
+
+// ---------------- ONLINE USERS ----------------
+const onlineUsers = ref([]);
+socket.on("online_users", (users) => {
+  onlineUsers.value = users;
+  console.log("Online users updated:", onlineUsers.value);
+});
+
+// ---------------- FETCH CHATS ----------------
+const fetchChats = async () => {
+  try {
+    const { data } = await axios.get("https://api.spcwin.info/admin/chats");
+    chats.value = data;
+  } catch (err) {
+    console.error("Failed to fetch chats:", err);
+  }
+};
+
+const filteredChats = computed(() =>
+  chats.value.filter(chat =>
+    chat.user_id?.toString().includes(search.value.toLowerCase())
+  )
+);
+
+// ---------------- SELECT CHAT ----------------
+const previousChatId = ref(null);
+const selectChat = async (chat) => {
+  if (!chat) return;
+
+  if (previousChatId.value) socket.emit("leave_chat", { chatId: previousChatId.value });
+  selectedChat.value = chat;
+  previousChatId.value = chat.id;
+
+  socket.emit("join_chat", { chatId: chat.id });
+
+  try {
+    const { data } = await axios.get(`https://api.spcwin.info/admin/chats/${chat.id}/messages`);
+    messages.value = data;
+    scrollToEnd();
+  } catch (err) {
+    console.error("Failed to fetch messages:", err);
+  }
+};
+
+// ---------------- SEND MESSAGE ----------------
+const sendMessage = async () => {
+  if (!input.value.trim() || !selectedChat.value) return;
+  const msgText = input.value.trim();
+  input.value = "";
+
+  try {
+    await axios.post(
+      `https://api.spcwin.info/admin/chats/${selectedChat.value.id}/message`,
+      { message: msgText }
+    );
+  } catch (err) {
+    console.error("Send message failed:", err);
+  }
+};
+
+// ---------------- MARK READ ----------------
+const markRead = async () => {
+  if (!selectedChat.value) return;
+  try {
+    await axios.post(`https://api.spcwin.info/admin/chats/${selectedChat.value.id}/read`);
+    selectedChat.value.unread_count = 0;
+    fetchChats();
+  } catch (err) {
+    console.error("Mark read failed:", err);
+  }
+};
+
+// ---------------- SCROLL ----------------
+const scrollToEnd = async () => {
+  await nextTick();
+  chatEnd.value?.scrollIntoView({ behavior: "smooth" });
+};
+
+const formatTime = (ts) => new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+onMounted(() => {
+  fetchChats();
+});
 
 // const { doesUserHaveAnyPermissions } = await permission();
 // const {
@@ -326,11 +494,13 @@ async function handleSignOut() {
   }
 }
 
-
+const unreadCounts = useState('unreadCounts', () => 0);
 const showLocation = async () => {
   seeLocation.value = true;
   await loadLocationData() 
 };
+
+
 
 
 

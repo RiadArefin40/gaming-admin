@@ -69,12 +69,18 @@ const search = ref("");
 const loading = ref(false);
 
 const filteredSms = computed(() =>
-  smsList.value.filter((sms) =>
-    Object.values(sms)
-      .join(" ")
-      .toLowerCase()
-      .includes(search.value.toLowerCase())
-  )
+  smsList.value
+    .filter((sms) => {
+      // Only allow bKash, Nagad, Rocket
+      const allowedSenders = ["bKash", "NAGAD", "16216"];
+      return allowedSenders.includes(sms.sender);
+    })
+    .filter((sms) =>
+      // Search filter
+      Object.values(sms)
+        .join(" ")
+        .includes(search.value)
+    )
 );
 
 async function fetchSms() {
@@ -82,6 +88,13 @@ async function fetchSms() {
   try {
     const res = await fetch("https://api.spcwin.info/users/admin/sms");
     smsList.value = await res.json();
+        // Extract and log all TxnID values
+    smsList.value.forEach((sms) => {
+      const match = sms.message.match(/TxnID[:\s]*([A-Za-z0-9]+)/i);
+      if (match) {
+        console.log("TxnID:", match[1]);
+      }
+    });
   } catch (err) {
     console.error("Failed to fetch SMS:", err);
   } finally {
