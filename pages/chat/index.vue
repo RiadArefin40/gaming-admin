@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="pa-6">
-    <!-- Header -->
+    <!-- Search -->
     <v-row class="mb-4">
       <v-col cols="12" md="4">
         <v-text-field
@@ -15,7 +15,7 @@
     </v-row>
 
     <v-row>
-      <!-- Chats list -->
+      <!-- Chat list -->
       <v-col cols="12" md="4">
         <v-card class="rounded-2xl elevation-4" style="height: 520px; overflow-y: auto;">
           <v-list>
@@ -27,14 +27,20 @@
               class="cursor-pointer"
             >
               <v-list-item-content>
-                <v-list-item-title>User: {{ chat.user_id }} </v-list-item-title>
+                <v-list-item-title ><span class="font-bold text-xl">{{ chat.name }}</span> </v-list-item-title>
                 <v-list-item-subtitle>
-                  Messages: {{ chat.user_messages || 0 }} | Status: {{ chat.status }}
+                  Messages: {{ chat.user_messages || 0 }} |
+                  Status: {{ chat.status }} |
+                  Unread: <strong>{{ chat.unread_count }}</strong>
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-icon>
-                <v-icon v-if="chat.status === 'open'" color="green">mdi-circle</v-icon>
-                <v-icon v-else color="red">mdi-circle-off</v-icon>
+         <v-icon :color="onlineUsers.includes(Number(chat.user_id)) ? 'green' : 'red'">
+  mdi-circle
+</v-icon>
+
+        {{ onlineUsers.includes(Number(chat.user_id)) ? 'Online' : 'Offline' }}
+                
               </v-list-item-icon>
             </v-list-item>
           </v-list>
@@ -44,9 +50,12 @@
       <!-- Chat window -->
       <v-col cols="12" md="8">
         <v-card class="rounded-2xl elevation-4" style="height: 520px; display: flex; flex-direction: column;">
-          <!-- Chat header -->
+          <!-- Header -->
           <v-card-title class="bg-yellow-400 text-black rounded-t-2xl">
             💬 Chat with User {{ selectedChat?.user_id || "" }}
+            <v-btn small class="ml-auto" color="green" @click="markRead">
+              Mark Read
+            </v-btn>
           </v-card-title>
 
           <!-- Messages -->
@@ -55,7 +64,6 @@
               <div :class="msg.sender === 'support' ? 'text-right' : 'text-left'">
                 <v-chip
                   :color="msg.sender == 'support' ? 'orange' : ''"
-                
                   class="ma-1"
                 >
                   {{ msg.message }}
@@ -90,70 +98,88 @@ import { ref, onMounted, computed, nextTick } from "vue";
 import { io } from "socket.io-client";
 import axios from "axios";
 
-// ----------------- STATE -----------------
+// ---------------- STATE ----------------
 const chats = ref([]);
 const selectedChat = ref(null);
 const messages = ref([]);
 const input = ref("");
 const search = ref("");
 const chatEnd = ref(null);
+// store online user_ids as a Set
 
-let previousChatId = null;
-
-// ----------------- SOCKET -----------------
+// ---------------- SOCKET ----------------
 const socket = io("https://api.spcwin.info", {
   transports: ["websocket"],
   path: "/socket.io",
 });
 
 socket.on("connect", () => console.log("✅ Socket connected:", socket.id));
-socket.on("connect_error", (err) => console.error("❌ Socket error:", err));
+socket.emit("admin_online"); // let server know admin is online
 
 socket.on("receive_message", (msg) => {
-  console.log("[DEBUG] Socket received message:", msg);
-  if (selectedChat.value && msg.chat_id === selectedChat.value.id) {
-    // prevent duplicate messages
-    if (!messages.value.find((m) => m.id === msg.id)) {
+  const chatIndex = chats.value.findIndex(c => c.id === msg.chat_id);
+
+  if (selectedChat.value?.id === msg.chat_id) {
+    if (!messages.value.find(m => m.id === msg.id)) {
       messages.value.push(msg);
       scrollToEnd();
     }
+  } else if (chatIndex !== -1) {
+    // reactive unread count
+    chats.value[chatIndex] = {
+      ...chats.value[chatIndex],
+      unread_count: (chats.value[chatIndex].unread_count || 0) + 1
+    };
   }
 });
 
-// ----------------- FETCH CHATS -----------------
+socket.on("unread_count", ({ chatId, count }) => {
+  const chatIndex = chats.value.findIndex(c => c.id === chatId);
+  if (chatIndex !== -1) {
+    chats.value[chatIndex] = {
+      ...chats.value[chatIndex],
+      unread_count: count
+    };
+  }
+});
+
+// ---------------- ONLINE USERS ----------------
+const onlineUsers = ref([]); // <-- array, not Set
+
+socket.on("online_users", (users) => {
+  onlineUsers.value = users; // array from server
+  console.log("Online users updated:", onlineUsers.value);
+});
+
+// ---------------- FETCH CHATS ----------------
 const fetchChats = async () => {
   try {
-    const { data } = await axios.get("https://api.spcwin.info/users/admin/chats");
+    const { data } = await axios.get("https://api.spcwin.info/admin/chats");
     chats.value = data;
-    console.log("[DEBUG] Fetched chats:", data);
   } catch (err) {
     console.error("Failed to fetch chats:", err);
   }
 };
 
-// Filtered chats
 const filteredChats = computed(() =>
   chats.value.filter(chat =>
     chat.user_id?.toString().includes(search.value.toLowerCase())
   )
 );
 
-// ----------------- SELECT CHAT -----------------
+// ---------------- SELECT CHAT ----------------
+const previousChatId = ref(null);
 const selectChat = async (chat) => {
   if (!chat) return;
 
-  // Leave previous room
-  if (previousChatId) socket.emit("leave_chat", { chatId: previousChatId });
-
+  if (previousChatId.value) socket.emit("leave_chat", { chatId: previousChatId.value });
   selectedChat.value = chat;
-  previousChatId = chat.id;
+  previousChatId.value = chat.id;
 
-  // Join socket room
   socket.emit("join_chat", { chatId: chat.id });
 
-  // Fetch messages
   try {
-    const { data } = await axios.get(`https://api.spcwin.info/users/admin/chats/${chat.id}/messages`);
+    const { data } = await axios.get(`https://api.spcwin.info/admin/chats/${chat.id}/messages`);
     messages.value = data;
     scrollToEnd();
   } catch (err) {
@@ -161,48 +187,48 @@ const selectChat = async (chat) => {
   }
 };
 
-// ----------------- SEND MESSAGE -----------------
+// ---------------- SEND MESSAGE ----------------
 const sendMessage = async () => {
   if (!input.value.trim() || !selectedChat.value) return;
-
   const msgText = input.value.trim();
   input.value = "";
 
   try {
-    const { data: savedMsg } = await axios.post(
-      `https://api.spcwin.info/users/admin/chats/${selectedChat.value.id}/message`,
+    await axios.post(
+      `https://api.spcwin.info/admin/chats/${selectedChat.value.id}/message`,
       { message: msgText }
     );
-    console.log("[DEBUG] Admin sent message:", savedMsg);
-    // no need to push locally, backend emits it
   } catch (err) {
-    console.error("Failed to send message:", err);
+    console.error("Send message failed:", err);
   }
 };
 
-// ----------------- SCROLL -----------------
+// ---------------- MARK READ ----------------
+const markRead = async () => {
+  if (!selectedChat.value) return;
+  try {
+    await axios.post(`https://api.spcwin.info/admin/chats/${selectedChat.value.id}/read`);
+    selectedChat.value.unread_count = 0;
+    fetchChats();
+  } catch (err) {
+    console.error("Mark read failed:", err);
+  }
+};
+
+// ---------------- SCROLL ----------------
 const scrollToEnd = async () => {
   await nextTick();
   chatEnd.value?.scrollIntoView({ behavior: "smooth" });
 };
 
-// ----------------- TIME FORMAT -----------------
 const formatTime = (ts) => new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-// ----------------- ON MOUNT -----------------
 onMounted(() => {
   fetchChats();
 });
 </script>
 
 <style scoped>
-.rounded-2xl {
-  border-radius: 1rem;
-}
-.cursor-pointer {
-  cursor: pointer;
-}
-.bg-yellow-100 {
-  background-color: #fff9c4 !important;
-}
+.cursor-pointer { cursor: pointer; }
+.bg-yellow-100 { background-color: #fff9c4 !important; }
 </style>
