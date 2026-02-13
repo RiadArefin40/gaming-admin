@@ -51,7 +51,7 @@
 </v-row>
 
 
-<v-container>
+<!-- <v-container>
   <v-row class="align-center">
     <v-col cols="12" sm="6">
       <span class="font-weight-medium">Cashout</span>
@@ -66,7 +66,7 @@
       ></v-switch>
     </v-col>
   </v-row>
-</v-container>
+</v-container> -->
 
     <!-- Payment Gateway Table -->
     <v-card class="rounded-2xl elevation-6">
