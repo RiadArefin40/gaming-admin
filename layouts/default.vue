@@ -78,7 +78,9 @@
     <NuxtLink to="/notifications">
       <v-list-item prepend-icon="mdi-bell" title="Notifications" class="menu-item" />
     </NuxtLink> -->
-
+   <NuxtLink to="/spin">
+      <v-list-item prepend-icon="mdi-credit-card" title="Spin Setting" class="menu-item" />
+    </NuxtLink>
     <NuxtLink to="/payment-gateway">
       <v-list-item prepend-icon="mdi-credit-card" title="Payment Gateway" class="menu-item" />
     </NuxtLink>
