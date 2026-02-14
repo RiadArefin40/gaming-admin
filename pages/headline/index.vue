@@ -109,6 +109,47 @@
           </div>
         </div>
 
+        <!-- Welcome Popup Tab -->
+<div v-if="activeTab === 'welcome'" class="tab-panel card">
+  <h3>Welcome Popup Banner</h3>
+
+  <!-- Image Upload -->
+  <input type="file" @change="onWelcomeFileChange" />
+
+  <v-img
+    height="120"
+    v-if="welcomeBanner.image_url"
+    :src="API_BASE + welcomeBanner.image_url"
+    class="preview"
+  />
+
+  <v-img
+    height="120"
+    v-if="welcomeBanner.preview"
+    :src="welcomeBanner.preview"
+    class="preview"
+  />
+
+  <!-- Welcome Text -->
+  <input
+    type="text"
+    v-model="welcomeBanner.text"
+    placeholder="Enter welcome text"
+  />
+
+  <div class="slider-actions">
+    <label>
+      <input type="checkbox" v-model="welcomeBanner.is_active" />
+      Active
+    </label>
+
+    <button :disabled="loading" @click="updateWelcomeBanner">
+      <span v-if="loading" class="spinner"></span>
+      {{ loading ? "Saving..." : "Save" }}
+    </button>
+  </div>
+</div>
+
       </div>
 
       <!-- Message -->
@@ -131,6 +172,7 @@ const tabs = [
   { key: "social", label: "Social Links" },
   { key: "hero", label: "Hero Sliders" },
   { key: "event", label: "Event Sliders" },
+    { key: "welcome", label: "Welcome Popup" }, // ✅ NEW
 ];
 
 
@@ -152,6 +194,14 @@ const ownerBonus = ref(0);
 const loading = ref(false);
 const message = ref("");
 const messageType = ref("");
+const welcomeBanner = ref({
+  id: null,
+  image_url: "",
+  text: "",
+  is_active: true,
+  file: null,
+  preview: null,
+});
 
 // Social Links
 const socialPlatforms = ["telegram","whatsapp","messenger"];
@@ -199,11 +249,29 @@ onMounted(async () => {
     const eventData = await resEvent.json();
     eventSlides.value = eventData.data;
 
+    // WELCOME BANNER
+const resWelcome = await fetch("https://api.spcwin.info/users/welcome-banner");
+const welcomeData = await resWelcome.json();
+
+if (welcomeData.data) {
+  welcomeBanner.value = {
+    ...welcomeData.data,
+    file: null,
+    preview: null,
+  };
+}
+
   } catch (err) {
     console.error("Failed to fetch settings:", err);
   }
 });
+function onWelcomeFileChange(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
+  welcomeBanner.value.file = file;
+  welcomeBanner.value.preview = URL.createObjectURL(file);
+}
 // Update Headline
 const updateHeadline = async () => {
   if (!title.value.trim()) return showMessage("Headline cannot be empty!", "error");
@@ -235,6 +303,52 @@ const updateReferral = async () => {
   finally { loading.value = false; }
 };
 
+const updateWelcomeBanner = async () => {
+  loading.value = true;
+
+  try {
+    const formData = new FormData();
+
+    if (welcomeBanner.value.file) {
+      formData.append("image", welcomeBanner.value.file);
+    } else if (welcomeBanner.value.image_url) {
+      formData.append("image_url", welcomeBanner.value.image_url);
+    }
+
+    formData.append("text", welcomeBanner.value.text || "");
+    formData.append(
+      "is_active",
+      welcomeBanner.value.is_active ? true : false
+    );
+
+    const method = welcomeBanner.value.id ? "PUT" : "POST";
+    const url = welcomeBanner.value.id
+      ? `https://api.spcwin.info/users/welcome-banner/${welcomeBanner.value.id}`
+      : `https://api.spcwin.info/users/welcome-banner`;
+
+    const res = await fetch(url, {
+      method,
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      welcomeBanner.value.id = data.data.id;
+      welcomeBanner.value.image_url = data.data.image_url;
+      welcomeBanner.value.file = null;
+      welcomeBanner.value.preview = null;
+      showMessage("Welcome banner saved!", "success");
+    } else {
+      showMessage(data.message || "Error saving banner", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showMessage("Error saving welcome banner", "error");
+  } finally {
+    loading.value = false;
+  }
+};
 // Update Social Link
 const updateSocial = async (platform) => {
   loading.value = true;
