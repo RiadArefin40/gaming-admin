@@ -253,9 +253,9 @@ onMounted(async () => {
 const resWelcome = await fetch("https://api.spcwin.info/users/welcome-banner");
 const welcomeData = await resWelcome.json();
 
-if (welcomeData.data) {
+if (welcomeData.data[0]) {
   welcomeBanner.value = {
-    ...welcomeData.data,
+    ...welcomeData.data[0],
     file: null,
     preview: null,
   };

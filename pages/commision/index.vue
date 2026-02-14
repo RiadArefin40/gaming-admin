@@ -39,6 +39,13 @@
             placeholder="00:05"
           />
         </v-col>
+           <v-col cols="12" sm="3">
+          <v-text-field
+            v-model="cronConfig.percent"
+            label="Percentage Value"
+            dense
+          />
+        </v-col>
 
         <v-col cols="12" sm="12" class="mt-2">
           <v-btn color="primary" @click="updateCronConfig">Update Schedule</v-btn>
