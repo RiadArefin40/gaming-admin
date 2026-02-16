@@ -103,10 +103,10 @@
 
 <NuxtLink to="/transactions" class="d-flex align-center">
   <v-badge
-    :content="unreadCount"
+    :content="totalUnreadCount"
     color="red"
     overlap
-    v-if="unreadCount > 0"
+    v-if="totalUnreadCount > 0"
   >
     <v-list-item
       prepend-icon="mdi-bank-transfer"
@@ -165,10 +165,10 @@
   <template #activator="{ props }">
     <v-btn v-bind="props" icon>
       <v-badge
-        :content="unreadCount"
+        :content="totalUnreadCount"
         color="red"
         overlap
-        v-if="unreadCount > 0"
+        v-if="totalUnreadCount > 0"
       >
         <v-icon size="28">mdi-bell</v-icon>
       </v-badge>
@@ -176,7 +176,7 @@
     </v-btn>
   </template>
 
-  <v-card class="notifications-card">
+  <v-card class="notifications-card" width="380">
     <v-card-title class="d-flex justify-space-between align-center">
       <span class="text-h6">Notifications</span>
       <v-btn text small color="primary" @click="markAllRead">
@@ -187,15 +187,18 @@
     <v-divider></v-divider>
 
     <v-list dense class="notifications-list">
+
       <v-list-item
-        v-for="notif in notifications"
-        :key="notif.id"
+        v-for="notif in allNotifications"
+        :key="notif.type + '-' + notif.id"
         @click="markAsRead(notif)"
         class="notification-item"
-        :class="{'notification-unread': !notif.read}"
+        :class="{ 'notification-unread': !notif.read }"
       >
         <v-list-item-avatar>
-          <v-icon color="primary">mdi-bell-ring</v-icon>
+          <v-icon :color="notif.type === 'deposit' ? 'green' : 'orange'">
+            {{ notif.type === 'deposit' ? 'mdi-cash-plus' : 'mdi-cash-minus' }}
+          </v-icon>
         </v-list-item-avatar>
 
         <v-list-item-content>
@@ -203,7 +206,7 @@
             {{ notif.message }}
           </v-list-item-title>
           <v-list-item-subtitle class="text-caption grey--text">
-            {{ new Date(notif.created_at).toLocaleString() }}
+            {{ formatDate(notif.created_at) }}
           </v-list-item-subtitle>
         </v-list-item-content>
 
@@ -212,11 +215,12 @@
         </v-list-item-icon>
       </v-list-item>
 
-      <v-list-item v-if="notifications.length === 0">
+      <v-list-item v-if="allNotifications.length === 0">
         <v-list-item-content class="text-center grey--text">
           No new notifications
         </v-list-item-content>
       </v-list-item>
+
     </v-list>
   </v-card>
 </v-menu>
@@ -503,122 +507,137 @@ const showLocation = async () => {
 
 
 
-
-// Notifications
-const notifications = ref([]);
-const unreadCount = ref(0);
 const notificationsModal = ref(false);
 
-
-
-const fetchNotifications = async () => {
-  try {
-    const { data, error } = await useFetch("https://api.spcwin.info/deposit/admin/notifications?unread=true", {
-      method: "GET",
-    });
-
-    if (error.value) {
-      console.error("Failed to fetch notifications:", error.value);
-      return;
-    }
-
-    notifications.value = data.value.notifications;
-    unreadCount.value = notifications.value.filter(n => !n.read).length;
-  } catch (err) {
-    console.error("Failed to fetch notifications:", err);
-  }
-};
-
-// Mark a notification as read
-const markAsRead = async (notif) => {
-  try {
-    const { error } = await useFetch(`https://api.spcwin.info/deposit/admin/notifications/${notif.id}/read`, {
-      method: "PATCH",
-    });
-
-    if (error.value) {
-      console.error("Failed to mark notification as read:", error.value);
-      return;
-    }
-
-    notif.read = true;
-    unreadCount.value = notifications.value.filter(n => !n.read).length;
-  } catch (err) {
-    console.error("Failed to mark notification as read:", err);
-  }
-};
-
-onMounted(fetchNotifications);
-
-
-// Run fetch only on client
-onMounted(() => {
-  fetchNotifications();
-
-  // Auto-refresh every 15s
-  setInterval(() => {
-    fetchNotifications();
-  }, 10000);
-});
-
+const depositNotifications = ref([]);
 const withdrawNotifications = ref([]);
-const unreadWithdrawCount = ref(0);
-const withdrawModal = ref(false);
+
+const totalUnreadCount = ref(0);
 
 
 
-// Fetch withdrawal notifications
-const fetchWithdrawNotifications = async () => {
+/* =============================
+   FETCH DEPOSIT NOTIFICATIONS
+============================= */
+const fetchDepositNotifications = async () => {
   try {
-    const { data, error } = await useFetch("https://api.spcwin.info/withdrawals/admin/withdraw_notifications?unread=true", {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const { data, error } = await useFetch(
+      "https://api.spcwin.info/deposit/admin/notifications?unread=true"
+    );
 
     if (!error.value && data.value) {
-      withdrawNotifications.value = data.value.notifications;
-      unreadWithdrawCount.value = withdrawNotifications.value.filter(n => !n.read).length;
+      depositNotifications.value = data.value.notifications.map(n => ({
+        ...n,
+        type: "deposit"
+      }));
     }
   } catch (err) {
-    console.error("Failed to fetch withdrawal notifications:", err);
+    console.error("Deposit notification error:", err);
   }
 };
 
-// Mark single notification as read
-const markWithdrawAsRead = async (notif) => {
+/* =============================
+   FETCH WITHDRAW NOTIFICATIONS
+============================= */
+const fetchWithdrawNotifications = async () => {
   try {
-    await useFetch(`https://api.spcwin.info/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
-      method: "PATCH",
-    });
+    const { data, error } = await useFetch(
+      "https://api.spcwin.info/withdrawals/admin/withdraw_notifications?unread=true",
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+
+    if (!error.value && data.value) {
+      withdrawNotifications.value = data.value.notifications.map(n => ({
+        ...n,
+        type: "withdraw"
+      }));
+    }
+  } catch (err) {
+    console.error("Withdraw notification error:", err);
+  }
+};
+
+/* =============================
+   MERGE BOTH LISTS
+============================= */
+const allNotifications = computed(() => {
+  const merged = [
+    ...depositNotifications.value,
+    ...withdrawNotifications.value
+  ];
+
+  // Sort newest first
+  return merged.sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+});
+
+/* =============================
+   CALCULATE TOTAL UNREAD
+============================= */
+const calculateUnread = () => {
+  totalUnreadCount.value = allNotifications.value.filter(
+    n => !n.read
+  ).length;
+};
+
+/* =============================
+   MARK SINGLE AS READ
+============================= */
+const markAsRead = async (notif) => {
+  try {
+    if (notif.type === "deposit") {
+      await useFetch(
+        `https://api.spcwin.info/deposit/admin/notifications/${notif.id}/read`,
+        { method: "PATCH" }
+      );
+    } else {
+      await useFetch(
+        `https://api.spcwin.info/withdrawals/admin/withdraw_notifications/${notif.id}/read`,
+        { method: "PATCH" }
+      );
+    }
 
     notif.read = true;
-    unreadWithdrawCount.value = withdrawNotifications.value.filter(n => !n.read).length;
+    calculateUnread();
   } catch (err) {
-    console.error("Failed to mark withdrawal notification as read:", err);
+    console.error("Mark as read error:", err);
   }
 };
 
-// Mark all as read
-const markAllWithdrawRead = async () => {
-  try {
-    for (const notif of withdrawNotifications.value.filter(n => !n.read)) {
-      await useFetch(`https://api.spcwin.info/withdrawals/admin/withdraw_notifications/${notif.id}/read`, {
-        method: "PATCH",
-      });
-      notif.read = true;
-    }
-    unreadWithdrawCount.value = 0;
-  } catch (err) {
-    console.error("Failed to mark all withdrawal notifications as read:", err);
+/* =============================
+   MARK ALL AS READ
+============================= */
+const markAllRead = async () => {
+  for (const notif of allNotifications.value.filter(n => !n.read)) {
+    await markAsRead(notif);
   }
+};
+
+/* =============================
+   FORMAT DATE
+============================= */
+const formatDate = (date) => {
+  return new Date(date).toLocaleString();
+};
+
+/* =============================
+   INITIAL LOAD + AUTO REFRESH
+============================= */
+const loadAll = async () => {
+  await fetchDepositNotifications();
+  await fetchWithdrawNotifications();
+  calculateUnread();
 };
 
 onMounted(() => {
-  fetchWithdrawNotifications();
+  loadAll();
 
   setInterval(() => {
-    fetchWithdrawNotifications();
-  }, 10000); // auto-refresh every 15s
+    loadAll();
+  }, 10000); // refresh every 10s
 });
 </script>
 
