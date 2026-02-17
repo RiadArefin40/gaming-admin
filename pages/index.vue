@@ -24,6 +24,17 @@
    
  
     </div>
+          <!-- STATS -->
+    <div class="">
+
+
+        <div  class="bg-slate-200 px-8 py-2" >
+          <div class="text-2xl">Active Package (Unpaid)</div>
+          <div class="">PT-2 (1650)</div>
+        </div>
+   
+ 
+    </div>
  
 
 
@@ -38,7 +49,7 @@
 
         <div  class="bg-slate-200 p-2" >
           <div class="text-2xl">Whatsapp-SMS</div>
-          <div class="text-green-900 font-bold">6971/7000</div>
+          <div class="text-green-900 font-bold">6956/7000</div>
         </div>
  
     </div>
@@ -47,7 +58,7 @@
 
         <div  class="bg-slate-200 p-2" >
           <div class="text-2xl">Gsm-SMS</div>
-          <div class="text-red-700 font-bold">7000/0</div>
+          <div class="text-red-700 font-bold">3000/0</div>
         </div>
  
     </div>
