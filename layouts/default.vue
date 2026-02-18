@@ -127,10 +127,10 @@
 
   <NuxtLink to="/widthraw" class="d-flex align-center">
   <v-badge
-    :content="unreadWithdrawCount"
+   :content="totalUnreadCount"
     color="orange"
     overlap
-    v-if="unreadWithdrawCount > 0"
+   v-if="totalUnreadCount > 0"
   >
     <v-list-item
       prepend-icon="mdi-cash"
