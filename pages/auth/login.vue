@@ -66,52 +66,108 @@ function required(v: any) {
 }
 
 /* ================= LOGIN ================= */
-async function  handleLogin() {
+// async function  handleLogin() {
+//   loading.value = true;
+
+//    try {
+//    const res = await fetch("https://api.spcwin.info/auth/login", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Accept: "*/*",
+//       },
+//       body: JSON.stringify({ identifier: username.value, password: password.value }),
+//     });
+
+//     const data = await res.json();
+//     if(data.user.role !== "admin" && data.user.role !== "agent"){
+//       toast.error("You do not have permission to access this panel");
+//       loading.value = false;
+//       return;
+//     }
+//     console.log(data);
+//       localStorage.setItem(
+//         "auth_user",
+//         JSON.stringify({
+//            username: data.user.name,
+//            role: data.user.role,
+//            wallet:data.user.wallet,
+//            id:data.user.id,
+//            loggedIn: true,
+//         })
+//       );
+//           toast.success("Successfully logged in");
+//       navigateTo("/");
+//   } catch (err) {
+//     console.error('login',err);
+//     loading.value = false;
+//   }
+
+//   // setTimeout(() => {
+//   // {
+
+
+//   //     toast.success("Successfully logged in");
+//   //     navigateTo("/");
+//   //   } 
+
+//   //   loading.value = false;
+//   // }, 800); // fake delay
+// }
+
+async function handleLogin() {
   loading.value = true;
 
-   try {
-   const res = await fetch("https://api.spcwin.info/auth/login", {
+  try {
+    const res = await fetch("https://api.spcwin.info/auth/admin/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Accept: "*/*",
       },
-      body: JSON.stringify({ identifier: username.value, password: password.value }),
+      body: JSON.stringify({
+        identifier: username.value,
+        password: password.value
+      }),
     });
 
     const data = await res.json();
-    if(data.user.role !== "admin" && data.user.role !== "agent"){
-      toast.error("You do not have permission to access this panel");
+
+    if (!res.ok) {
+      toast.error(data.error || "Login failed");
       loading.value = false;
       return;
     }
-    console.log(data);
-      localStorage.setItem(
-        "auth_user",
-        JSON.stringify({
-           username: data.user.name,
-           role: data.user.role,
-           wallet:data.user.wallet,
-           id:data.user.id,
-           loggedIn: true,
-        })
-      );
-          toast.success("Successfully logged in");
-      navigateTo("/");
+
+    // 🔐 Role protection
+    // if (data.user.role !== "admin" && data.user.role !== "agent") {
+    //   toast.error("You do not have permission to access this panel");
+    //   loading.value = false;
+    //   return;
+    // }
+
+    // ✅ Save token in sessionStorage (auto logout on browser close)
+    sessionStorage.setItem("auth_token", data.token);
+
+    // Save user info
+    sessionStorage.setItem(
+      "auth_user",
+      JSON.stringify({
+        username: data.user.name,
+        role: data.user.role,
+        id: data.user.id,
+        wallet: data.user.wallet
+      })
+    );
+
+    toast.success("Successfully logged in");
+
+    navigateTo("/");
+
   } catch (err) {
-    console.error('login',err);
-    loading.value = false;
+    console.error("login error:", err);
+    toast.error("Server error");
   }
 
-  // setTimeout(() => {
-  // {
-
-
-  //     toast.success("Successfully logged in");
-  //     navigateTo("/");
-  //   } 
-
-  //   loading.value = false;
-  // }, 800); // fake delay
+  loading.value = false;
 }
 </script>

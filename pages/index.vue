@@ -246,7 +246,7 @@ const headers = [
 // Transaction tab: All / Deposit / Withdraw
 const transactionTab = ref('All')
 const user = process.client
-  ? JSON.parse(localStorage.getItem("auth_user"))
+  ? JSON.parse(sessionStorage.getItem("auth_user"))
   : null;
 const currentUserRole = user?.role || (user ? user.role : null);
 const dialogActionHistory = ref(false);
