@@ -125,7 +125,7 @@ const filteredTransactions = computed(() =>
 );
 
 const user = process.client
-  ? JSON.parse(localStorage.getItem("auth_user"))
+  ? JSON.parse(sessionStorage.getItem("auth_user"))
   : null;
 const currentUserRole = user?.role || (user ? user.role : null);
 
@@ -227,7 +227,7 @@ const withdrawNotifications = ref([]);
 const unreadWithdrawCount = ref(0);
 const withdrawModal = ref(false);
 
-// const token = localStorage.getItem("access_token");
+// const token = sessionStorage.getItem("access_token");
 
 // Fetch withdrawal notifications
 const fetchWithdrawNotifications = async () => {

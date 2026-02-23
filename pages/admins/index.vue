@@ -282,7 +282,7 @@
 import { ref, computed, onMounted } from "vue";
 import { VSonner, toast } from "vuetify-sonner";
 const user = process.client
-  ? localStorage.getItem("auth_user")
+  ? sessionStorage.getItem("auth_user")
   : null;
 const currentUserRole = user?.role || (user ? JSON.parse(user).role : null);
 

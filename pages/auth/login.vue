@@ -86,7 +86,7 @@ function required(v: any) {
 //       return;
 //     }
 //     console.log(data);
-//       localStorage.setItem(
+//       sessionStorage.setItem(
 //         "auth_user",
 //         JSON.stringify({
 //            username: data.user.name,

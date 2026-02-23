@@ -286,7 +286,7 @@ import { io } from "socket.io-client";
 
 const chats = ref([]);
 const user = process.client
-  ? localStorage.getItem("auth_user")
+  ? sessionStorage.getItem("auth_user")
   : null;
 
 //  const token = useAuthData?.token?.value;
@@ -488,7 +488,7 @@ async function handleSignOut() {
   try {
   
       if (process.client) {
-         localStorage.removeItem("auth_user");
+         sessionStorage.removeItem("auth_user");
          toast.warning("successfully SignOut");
          navigateTo("/auth/login");
      }

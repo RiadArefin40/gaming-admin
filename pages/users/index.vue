@@ -301,7 +301,7 @@ const loadingTransactions = ref(false)
 
 const activeTab = ref("deposit")
 const user = process.client
-  ? JSON.parse(localStorage.getItem("auth_user"))
+  ? JSON.parse(sessionStorage.getItem("auth_user"))
   : null;
 const currentUserRole = user?.role || (user ? user.role : null);
 
